@@ -1,0 +1,27 @@
+/* App.less Style Sheets */
+/* Less Variables */
+/* Main Tags */
+a {
+  text-decoration: none;
+  color: #3498db;
+  -o-transition: color 0.2s ease-out, background 1s ease-in;
+  -ms-transition: color 0.2s ease-out, background 1s ease-in;
+  -moz-transition: color 0.2s ease-out, background 1s ease-in;
+  -webkit-transition: color 0.2s ease-out, background 1s ease-in;
+  transition: color 0.2s ease-out, background 1s ease-in;
+}
+a:hover,
+a:active {
+  color: #f1c40f;
+  text-decoration: none;
+}
+.main {
+  padding: 40px;
+}
+.center {
+  text-align: center;
+  margin: auto;
+}
+.row {
+  margin: 20px;
+}

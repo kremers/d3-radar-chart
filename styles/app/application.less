@@ -1,0 +1,27 @@
+/* Main Tags */
+a{
+  text-decoration: none;
+  color: @blue;
+  -o-transition:color .2s ease-out, background 1s ease-in;
+  -ms-transition:color .2s ease-out, background 1s ease-in;
+  -moz-transition:color .2s ease-out, background 1s ease-in;
+  -webkit-transition:color .2s ease-out, background 1s ease-in;
+  transition:color .2s ease-out, background 1s ease-in;
+  &:hover, &:active{
+    color: @yellow;
+    text-decoration: none;
+  }
+}
+
+.main {
+  padding: 40px;
+}
+
+.center {
+  text-align: center;
+  margin: auto;
+}
+
+.row {
+  margin: 20px;
+}
