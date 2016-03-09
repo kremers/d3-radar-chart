@@ -1,12 +1,12 @@
 var RadarChart = {
   draw: function(id, d, options){
     var cfg = {
-      radius: 6,    // 點的半徑
+      radius: 6,    // Radius Point
       w: 600,
       h: 600,
-      factor: 1,    // 框的縮放比例
-      factorLegend: .85,
-      levels: 3,    // 幾層框
+      factor: 1,    // Scaling Box
+      factorLegend: 0.85,
+      levels: 3,    // Layers Box
       maxValue: 0,
       radians: 2 * Math.PI,
       opacityArea: 0.5,
@@ -20,29 +20,30 @@ var RadarChart = {
       }
     }
 
-    cfg.maxValue = Math.max(cfg.maxValue, d3.max(d.map(function(o){return o.value}))); 
+    cfg.maxValue = Math.max(cfg.maxValue, d3.max(d.map(function(o){return o.value})));
     var allAxis = (d.map(function(i, j){return i.axis}));
-    var total = allAxis.length;    
+    var total = allAxis.length;
     var radius = cfg.factor*Math.min(cfg.w/2, cfg.h/2);
 
-    // 初始化畫布    
+    // Initialization canvas
     d3.select(id).select("svg").remove();
     var g = d3.select(id).append("svg").attr("width", cfg.w).attr("height", cfg.h).append("g");
 
     var tooltip;
 
     drawFrame();
-    var maxAxisValues = []; // 儲存該坐標軸的最大 x, y
+    var maxAxisValues = []; // The axis of maximum values x, y
+    var minAxisValues = []; // need to figure this out
     drawAxis();
     var dataValues = [];
     reCalculatePoints();
-    
+
     var areagg = initPolygon();
     drawPoly();
 
     drawnode();
 
-    // 框
+    // box
     function drawFrame(){
       for(var j=0; j<cfg.levels; j++){
         var levelFactor = cfg.factor*radius*((j+1)/cfg.levels);
@@ -54,8 +55,8 @@ var RadarChart = {
          .attr("class", "line").style("stroke", "grey").style("stroke-width", "0.5px").attr("transform", "translate(" + (cfg.w/2-levelFactor) + ", " + (cfg.h/2-levelFactor) + ")");;
       }
     }
-    
-    // 坐標軸
+
+    // Axis
     function drawAxis(){
       var axis = g.selectAll(".axis").data(allAxis).enter().append("g").attr("class", "axis");
 
@@ -78,7 +79,7 @@ var RadarChart = {
           .attr("y", function(d, i){return cfg.h/2*(1-Math.cos(i*cfg.radians/total))+20*Math.cos(i*cfg.radians/total);});
     }
 
-    // 根據輸入的資料計算多邊形要畫的點
+    // Calculated based on the input data points to draw a polygon
     function reCalculatePoints(){
       g.selectAll(".nodes")
         .data(d, function(j, i){
@@ -91,7 +92,7 @@ var RadarChart = {
       dataValues[d[0].length] = dataValues[0];
     }
 
-    // 初始化多邊形
+    // Initialization polygon
     function initPolygon(){
       return g.selectAll("area").data([dataValues])
                 .enter()
@@ -101,7 +102,7 @@ var RadarChart = {
                 .style("stroke", cfg.color(0))
                 .on('mouseover', function (d){
                   z = "polygon."+d3.select(this).attr("class");
-                  g.selectAll("polygon").transition(200).style("fill-opacity", 0.1); 
+                  g.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
                   g.selectAll(z).transition(200).style("fill-opacity", 0.7);
                 })
                 .on('mouseout', function(){
@@ -111,19 +112,19 @@ var RadarChart = {
                 .style("fill-opacity", cfg.opacityArea);
     }
 
-    // 畫多邊形
+    // animate polygon
     function drawPoly(){
       areagg.attr("points",function(de) {
           var str="";
           for(var pti=0;pti<de.length;pti++){
             str=str+de[pti][0]+","+de[pti][1]+" ";
-          }            
+          }
           return str;
         });
     }
-    
-    // 畫點
-    function drawnode(){    
+
+    // draw node
+    function drawnode(){
       g.selectAll(".nodes")
         .data(d).enter()
         .append("svg:circle").attr("class", "radar-chart-serie0")
@@ -157,23 +158,24 @@ var RadarChart = {
     //Tooltip
     tooltip = g.append('text').style('opacity', 0).style('font-family', 'sans-serif').style('font-size', 13);
 
-
+    //moves the point along the axis
+    //dobj returns the entire axis data element, so it might be worth to try and reformat the data ot
     function move(dobj, i){
       this.parentNode.appendChild(this);
       var dragTarget = d3.select(this);
 
       var oldData = dragTarget.data()[0];
-      // 進行座標位移歸零，以方便計算斜率
+      // Displacement coordinates are zero, in order to facilitate the calculation of the slope
       var oldX = parseFloat(dragTarget.attr("cx")) - 300;
       var oldY = 300 - parseFloat(dragTarget.attr("cy"));
       var newY = 0, newX = 0, newValue = 0;
       var maxX = maxAxisValues[i].x - 300;
       var maxY = 300 - maxAxisValues[i].y;
 
-      // 斜率為無限大的特殊情況
+      // Infinite slope special case
       if(oldX == 0) {
         newY = oldY - d3.event.dy;
-        // 檢查是否超過範圍
+        // Check exceeds the range
         if(Math.abs(newY) > Math.abs(maxY)) {
           newY = maxY;
         }
@@ -181,27 +183,28 @@ var RadarChart = {
       }
       else
       {
-        var slope = oldY / oldX;   // 斜率       
+        var slope = oldY / oldX;   // 斜率
         newX = d3.event.dx + parseFloat(dragTarget.attr("cx")) - 300;
-        // 檢查是否超過範圍
+        // Check exceeds the range
         if(Math.abs(newX) > Math.abs(maxX)) {
           newX = maxX;
         }
         newY = newX * slope;
 
-        var ratio = newX / oldX; // 利用相似三角形等比的概念計算新的值
+        //Using the concept of similar triangles to calculate the new value of the geometric
+        var ratio = newX / oldX;
         newValue = ratio * oldData.value;
       }
-      
-      // 重新設定點的座標
+
+      // Reset coordinate point
       dragTarget
           .attr("cx", function(){return newX + 300 ;})
           .attr("cy", function(){return 300 - newY;});
-      // 重新設定點的值
+      // Re-set point value
       d[oldData.order].value=newValue;
-      // 重新計算多邊形的轉折點
+      // Recalculation polygon turning point
       reCalculatePoints();
-      // 重畫多邊形
+      // Redraw polygon
       drawPoly();
     }
 
