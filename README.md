@@ -5,5 +5,10 @@ D3 Powered Draggable Radar Chart with Min-Max Ranges per Axis
 - Original [Radar Chart](https://github.com/alangrafu/radar-chart-d3)
 - Nodes on the Radar Chart are draggable, with each axis containing a min and max value for indicating range
 
+Instructions & Notes:
+1. Download Zip / Fork Repo
+2. To Compile LESS run `lessc styles/app.less > styles/app.css` in root directory
+3. Open `index.html`
+
 [@tenji240](https://twitter.com/tenji240)
 [@mustwin](https://twitter.com/mustwin)
