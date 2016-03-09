@@ -1,12 +1,9 @@
-d3-radar-chart-draggable
+D3 Powered Draggable Radar Chart with Min-Max Ranges per Axis
 ========================
 
-draw the radar chart by d3.js
+- Chart is Powered by [D3](http://d3js.org/)
+- Original [Radar Chart](https://github.com/alangrafu/radar-chart-d3)
+- Nodes on the Radar Chart are draggable, with each axis containing a min and max value for indicating range
 
-the nodes on radar chart are draggable
-
-references:
-
-http://d3js.org/
-
-https://github.com/alangrafu/radar-chart-d3
+(@tenji240)[https://twitter.com/tenji240]
+(@mustwin)[https://twitter.com/mustwin]
