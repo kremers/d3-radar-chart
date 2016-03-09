@@ -14,7 +14,7 @@
   <!-- Javascript -->
   <script src="js/jquery-2.1.4.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
-  <script src="http://d3js.org/d3.v3.min.js"></script>
+  <script src="js/d3.min.js"></script>
   <script src="js/radar-chart.js"></script>
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -27,66 +27,68 @@
 
 <body>
 
+  <nav class="navbar navbar-default navbar-fixed-top navbar-inverse">
+    <div class="container-fluid">
+      <!-- Brand and toggle get grouped for better mobile display -->
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="http://tembot.me/d3-radar-chart/">Radar Chart</a>
+      </div>
+
+      <!-- Collect the nav links, forms, and other content for toggling -->
+      <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+        <ul class="nav navbar-nav navbar-right">
+          <li><a href="http://tembot.me/">Tembot.me</a></li>
+      </div><!-- /.navbar-collapse -->
+    </div><!-- /.container-fluid -->
+  </nav>
+
   <div class="main">
     <!-- Enter your content in here -->
     <div class="row">
-      <h2 class="center">Example of radar chart</h2>
-      <h4 class="center"><a href='https://github.com/alangrafu/radar-chart-d3'>https://github.com/alangrafu/radar-chart-d3</a></h4>
+
     </div>
 
     <div class="row">
-      <div id="chart" class="col-md-6"></div>
-      <div class="col-md-6">
-        Code:
-        <pre>
-          d = [
-               {axis: "strength", value: 13, order:0},
-               {axis: "intelligence", value: 1, order:1},
-               {axis: "charisma", value: 8, order:2},
-               {axis: "dexterity", value: 4, order:3},
-               {axis: "luck", value: 10, order:4},
-               {axis: "azole", value: 10, order:5}
-              ]
-          ];
+      <div id="chart" class="col-md-7"></div>
+      <div class="col-md-5">
+        <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
+        <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
+        <blockquote>
+          <p>This function generates a new array with 3 objects every time.</p>
+          <p>The values for each axis are randomized.</p>
+          <p>In order to re-generate the radar chart, you jsut need to run.</p>
+          <p><code>RadarChart.draw("#chart2", data)</code> as usual.</p>
+          <footer> <a href="https://github.com/azole">azole</a> </footer>
+        </blockquote>
 
-          RadarChart.draw("#chart", d);
+        <strong>Code:</strong>
+        <pre>
+//Single Axis Data
+
+var data = [
+     {axis: "strength", value: 12, order: 0},
+     {axis: "intelligence", value: 1, order: 1},
+     {axis: "charisma", value: 8, order: 2},
+     {axis: "dexterity", value: 4, order: 3},
+     {axis: "luck", value: 10, order: 4},
+     {axis: "agility", value: 10, order: 5}
+    ]
+];
+
+RadarChart.draw("#chart", data);
        </pre>
       </div>
     </div>
-
-    <script>
-      var d = [{
-        axis: "strength",
-        value: 13,
-        order: 0
-      }, {
-        axis: "intelligence",
-        value: 1,
-        order: 1
-      }, {
-        axis: "charisma",
-        value: 8,
-        order: 2
-      }, {
-        axis: "dexterity",
-        value: 4,
-        order: 3
-      }, {
-        axis: "luck",
-        value: 10,
-        order: 4
-      }, {
-        axis: "azole",
-        value: 10,
-        order: 5
-      }];
-      RadarChart.draw("#chart", d);
-
-      //This function generates a new array with 3 objects every time. The values for each axis are randomized
-      //In order to re-generate the radar chart, you jsut need to run RadarChart.draw("#chart2", data) as usual.
-    </script>
   </div>
-  <small>Updated by <a href="http://tembot.me/">Tembot</a></small>
+  <div class="container center">
+    <small>Maintained by <a href="http://tembot.me/">Tembot</a></small> | <small>Follow me on <a href="http://twitter.com/tenji240">Twitter</a></small>
+  </div>
 </body>
 
 </html>
