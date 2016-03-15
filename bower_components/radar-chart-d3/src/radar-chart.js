@@ -58,15 +58,18 @@ var RadarChart = {
         tooltip.attr("transform", "translate(" + (coords[0]+10) + "," + (coords[1]-10) + ")")
       }
     }
+    function dragNode(node){
+      console.log("dragging: " + JSON.stringify(node));
+    }
     function radar(selection) {
       selection.each(function(data) {
         var container = d3.select(this);
         var tooltip = container.selectAll('g.tooltip').data([data[0]]);
-        
+
         var tt = tooltip.enter()
           .append('g')
           .classed('tooltip', true)
-        
+
         tt.append('rect').classed("tooltip", true);
         tt.append('text').classed("tooltip", true);
 
@@ -82,7 +85,7 @@ var RadarChart = {
           return d3.max(d.axes, function(o){ return o.value; });
         }));
         maxValue -= cfg.minValue;
-        
+
         var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
         var radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
@@ -301,6 +304,8 @@ var RadarChart = {
               container.classed('focus', 0);
               //container.select('.area.radar-chart-serie'+dd[1]).classed('focused', 0);
               //No idea why previous line breaks tooltip hovering area after hoverin point.
+            }).on('drag', function(dd){
+              dragNode(dd);
             });
 
           circle.exit()
@@ -327,7 +332,7 @@ var RadarChart = {
               .each('start', function() {
                 d3.select(this).classed('d3-enter', 0); // trigger css transition
               });
-          
+
           //Make sure layer order is correct
           var poly_node = polygon.node();
           poly_node.parentNode.appendChild(poly_node);
