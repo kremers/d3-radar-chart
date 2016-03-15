@@ -9,13 +9,15 @@
 
   <!-- Bootstrap -->
   <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="bower_components/radar-chart-d3/src/radar-chart.css">
   <link href="styles/app.css" rel="stylesheet">
 
   <!-- Javascript -->
   <script src="js/jquery-2.1.4.min.js"></script>
   <script src="js/bootstrap.min.js"></script>
   <script src="js/d3.min.js"></script>
-  <script src="js/radar-chart.js"></script>
+  <script src="bower_components/radar-chart-d3/src/radar-chart.js"></script>
+  <script src="js/dual.js"></script>
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -43,8 +45,8 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          <li class="active"><a href="two-index.html">Single Chart</a></li>
-          <li><a href="two-charts.html">Two Charts</a></li>
+          <li><a href="two-index.html">Single Chart</a></li>
+          <li class="active"><a href="two-charts.html">Two Charts</a></li>
           <li><a href="http://tembot.me/">Tembot.me</a></li>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -61,29 +63,31 @@
       <div class="col-md-5">
         <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
         <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
-        <blockquote>
-          <p>This function generates a new array with 3 objects every time.</p>
-          <p>The values for each axis are randomized.</p>
-          <p>In order to re-generate the radar chart, you jsut need to run.</p>
-          <p><code>RadarChart.draw("#chart2", data)</code> as usual.</p>
-          <footer> <a href="https://github.com/azole">azole</a> </footer>
-        </blockquote>
 
         <strong>Code:</strong>
         <pre>
-//Single Axis Data
-
 var data = [
-     {axis: "strength", value: 12, order: 0},
-     {axis: "intelligence", value: 1, order: 1},
-     {axis: "charisma", value: 8, order: 2},
-     {axis: "dexterity", value: 4, order: 3},
-     {axis: "luck", value: 10, order: 4},
-     {axis: "agility", value: 10, order: 5}
+  {
+    className: 'germany', // optional can be used for styling
+    axes: [
+      {axis: "strength", value: 13, yOffset: 10},
+      {axis: "intelligence", value: 6},
+      {axis: "charisma", value: 5},
+      {axis: "dexterity", value: 9},
+      {axis: "luck", value: 2, xOffset: -20}
     ]
+  },
+  {
+    className: 'argentina',
+    axes: [
+      {axis: "strength", value: 6},
+      {axis: "intelligence", value: 7},
+      {axis: "charisma", value: 10},
+      {axis: "dexterity", value: 13},
+      {axis: "luck", value: 9}
+    ]
+  }
 ];
-
-RadarChart.draw("#chart", data);
        </pre>
       </div>
     </div>
