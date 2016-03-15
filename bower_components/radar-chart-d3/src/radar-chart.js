@@ -58,8 +58,9 @@ var RadarChart = {
         tooltip.attr("transform", "translate(" + (coords[0]+10) + "," + (coords[1]-10) + ")")
       }
     }
-    function dragNode(node){
-      console.log("dragging: " + JSON.stringify(node));
+    function dragNode(elem){
+      var target =  d3.select(elem);
+      console.log(target[0]);
     }
     function radar(selection) {
       selection.each(function(data) {
@@ -304,7 +305,7 @@ var RadarChart = {
               container.classed('focus', 0);
               //container.select('.area.radar-chart-serie'+dd[1]).classed('focused', 0);
               //No idea why previous line breaks tooltip hovering area after hoverin point.
-            }).on('drag', function(dd){
+            }).on('click', function(dd){
               dragNode(dd);
             });
 
