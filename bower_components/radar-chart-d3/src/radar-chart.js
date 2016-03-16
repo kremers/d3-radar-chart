@@ -15,7 +15,7 @@ var RadarChart = {
     axisLine: true,
     axisText: true,
     circles: true,
-    radius: 5,
+    radius: 10,
     backgroundTooltipColor: "#555",
     backgroundTooltipOpacity: "0.7",
     tooltipColor: "white",
@@ -58,15 +58,51 @@ var RadarChart = {
         tooltip.attr("transform", "translate(" + (coords[0]+10) + "," + (coords[1]-10) + ")")
       }
     }
+    function dragAlt(d){
+      d3.select(this)
+        .attr('cx', d[0].x = d[0].x + d3.event.dx)
+        .attr('cy', d[0].y = d[0].y + d3.event.dy);
+    }
+    var drag = d3.behavior
+                 .drag()
+                 .origin(function(d) { return d; })
+                 .on("drag", dragAlt);
+    function dragNode(elem){
+      var target =  d3.select(elem);
+      var tar_obj = target[0][0][0];
+      var old_pos = {x: tar_obj.x, y: tar_obj.y};
+      var new_pos = {x: 0, y: 0};
+      var new_val = 0;
+
+      if(old_pos.x === 0) {
+        new_pos.x =  old_pos.x - d3.event.y;
+        new_val = (new_pos.y / old_pos.y ) * tar_obj.value;
+      } else {
+
+        var slope = old_pos.y / old_pos.x;
+        new_pos.x = d3.event.x + old_pos.x - 300;
+        new_pos.y = new_pos.x * slope;
+        var ratio = new_pos.x / old_pos.x;
+        new_val = ratio * tar_obj.value;
+      }
+
+      tar_obj.x = new_pos.x + 300;
+      tar_obj.y = 300 - new_pos.y;
+      tar_obj.value = new_val;
+
+      target.x = tar_obj.x;
+      target.y = tar_obj.y;
+      target.value = tar_obj.value;
+    }
     function radar(selection) {
       selection.each(function(data) {
         var container = d3.select(this);
         var tooltip = container.selectAll('g.tooltip').data([data[0]]);
-        
+
         var tt = tooltip.enter()
           .append('g')
           .classed('tooltip', true)
-        
+
         tt.append('rect').classed("tooltip", true);
         tt.append('text').classed("tooltip", true);
 
@@ -82,7 +118,7 @@ var RadarChart = {
           return d3.max(d.axes, function(o){ return o.value; });
         }));
         maxValue -= cfg.minValue;
-        
+
         var allAxis = data[0].axes.map(function(i, j){ return {name: i.axis, xOffset: (i.xOffset)?i.xOffset:0, yOffset: (i.yOffset)?i.yOffset:0}; });
         var total = allAxis.length;
         var radius = cfg.factor * Math.min(cfg.w / 2, cfg.h / 2);
@@ -289,7 +325,10 @@ var RadarChart = {
 
           circle.enter().append('circle')
             .classed({circle: 1, 'd3-enter': 1})
-            .on('mouseover', function(dd){
+            .attr("cx", function(d) { return d.x; })
+            .attr("cy", function(d) { return d.y; })
+            .call(drag);
+            /*.on('mouseover', function(dd){
               d3.event.stopPropagation();
               setTooltip(tooltip, cfg.tooltipFormatValue(dd[0].value));
               //container.classed('focus', 1);
@@ -301,7 +340,7 @@ var RadarChart = {
               container.classed('focus', 0);
               //container.select('.area.radar-chart-serie'+dd[1]).classed('focused', 0);
               //No idea why previous line breaks tooltip hovering area after hoverin point.
-            });
+            }).on('drag', function(dd){ dragNode(dd); });*/
 
           circle.exit()
             .classed('d3-exit', 1) // trigger css transition
@@ -327,7 +366,7 @@ var RadarChart = {
               .each('start', function() {
                 d3.select(this).classed('d3-enter', 0); // trigger css transition
               });
-          
+
           //Make sure layer order is correct
           var poly_node = polygon.node();
           poly_node.parentNode.appendChild(poly_node);

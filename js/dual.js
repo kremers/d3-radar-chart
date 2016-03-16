@@ -1,4 +1,6 @@
 $(document).ready(function(){
+
+  //Example Data
   var data = [
     {
       className: 'argentina',
@@ -22,5 +24,14 @@ $(document).ready(function(){
     }
   ];
 
-  RadarChart.draw("#chart", data);
+  //drag function is inside the bounds of the api, so I can move it from there
+
+  //Initialize the Chart
+  var chart = RadarChart.chart();
+  var svg = d3.select('#chart').append('svg')
+              .attr('width', 600)
+              .attr('height', 800);
+
+  //Call the Chart and Render It
+  svg.append('g').classed('focus', 1).datum(data).call(chart);
 });
