@@ -60,17 +60,20 @@ var RadarChart = {
     }
     function dragNode(elem){
       var target =  d3.select(elem);
-      var tar_obj = target[0][0][0]
+      var tar_obj = target[0][0][0];
       var old_pos = {x: tar_obj.x, y: tar_obj.y};
       var new_pos = {x: 0, y: 0};
       var new_val = 0;
 
+      console.log("old: " + JSON.stringify(tar_obj));
+      console.log(this.RadarChart);
       if(old_pos.x === 0) {
-        new_pos.x =  old_pos.x - d3.event.dy;
+        new_pos.x =  old_pos.x - d3.event.y;
         new_val = (new_pos.y / old_pos.y ) * tar_obj.value;
       } else {
+
         var slope = old_pos.y / old_pos.x;
-        new_pos.x = d3.event.dx + old_pos.x - 300;
+        new_pos.x = d3.event.x + old_pos.x - 300;
         new_pos.y = new_pos.x * slope;
         var ratio = new_pos.x / old_pos.x;
         new_val = ratio * tar_obj.value;
@@ -79,7 +82,6 @@ var RadarChart = {
       tar_obj.x = new_pos.x + 300;
       tar_obj.y = 300 - new_pos.y;
       tar_obj.value = new_val;
-
       target[0][0][0] = tar_obj;
     }
     function radar(selection) {
@@ -313,7 +315,7 @@ var RadarChart = {
 
           circle.enter().append('circle')
             .classed({circle: 1, 'd3-enter': 1})
-            .on('mouseover', function(dd){
+            /*.on('mouseover', function(dd){
               d3.event.stopPropagation();
               setTooltip(tooltip, cfg.tooltipFormatValue(dd[0].value));
               //container.classed('focus', 1);
@@ -325,7 +327,7 @@ var RadarChart = {
               container.classed('focus', 0);
               //container.select('.area.radar-chart-serie'+dd[1]).classed('focused', 0);
               //No idea why previous line breaks tooltip hovering area after hoverin point.
-            }).on('drag', function(dd){ dragNode(dd); });
+            })*/.on('click', function(dd){ dragNode(dd); });
 
           circle.exit()
             .classed('d3-exit', 1) // trigger css transition
