@@ -59,8 +59,6 @@ var RadarChart = {
       }
     }
     function dragAlt(d){
-      console.log(d3.event);
-      console.log("[ " + d3.event.dx + "," + d3.event.dy + "]");
       d3.select(this)
         .attr('cx', d[0].x = d[0].x + d3.event.dx)
         .attr('cy', d[0].y = d[0].y + d3.event.dy);
@@ -76,7 +74,6 @@ var RadarChart = {
       var new_pos = {x: 0, y: 0};
       var new_val = 0;
 
-      console.log("old: " + JSON.stringify(tar_obj));
       if(old_pos.x === 0) {
         new_pos.x =  old_pos.x - d3.event.y;
         new_val = (new_pos.y / old_pos.y ) * tar_obj.value;
@@ -96,9 +93,6 @@ var RadarChart = {
       target.x = tar_obj.x;
       target.y = tar_obj.y;
       target.value = tar_obj.value;
-
-      //d3.select(elem[0]).attr("x", tar_obj.x).attr("y", tar_obj.y);
-
     }
     function radar(selection) {
       selection.each(function(data) {
