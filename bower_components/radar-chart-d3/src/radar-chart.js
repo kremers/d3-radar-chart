@@ -81,8 +81,6 @@ var RadarChart = {
       tar_obj.value = new_val;
 
       target[0][0][0] = tar_obj;
-
-      console.log(target[0][0][0]);
     }
     function radar(selection) {
       selection.each(function(data) {
@@ -327,9 +325,7 @@ var RadarChart = {
               container.classed('focus', 0);
               //container.select('.area.radar-chart-serie'+dd[1]).classed('focused', 0);
               //No idea why previous line breaks tooltip hovering area after hoverin point.
-            }).on('click', function(dd){
-              dragNode(dd);
-            });
+            }).on('drag', function(dd){ dragNode(dd); });
 
           circle.exit()
             .classed('d3-exit', 1) // trigger css transition
