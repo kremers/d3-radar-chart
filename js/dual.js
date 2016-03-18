@@ -30,7 +30,7 @@ $(document).ready(function(){
   RadarChart.defaultConfig.ogData = data;
   console.log(RadarChart.defaultConfig.ogData);
   var chart = RadarChart.chart();
-  var svg = d3.select('#chart')
+  var svg = d3.select('#chartdiff')
               .append('svg')
               .attr('width', 600)
               .attr('height', 800)
