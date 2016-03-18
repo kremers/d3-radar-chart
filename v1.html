@@ -5,11 +5,10 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>D3 Draggable Chart: Two Charts</title>
+  <title>D3 Draggable Chart: Version 1.0</title>
 
   <!-- Bootstrap -->
   <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
-  <link rel="stylesheet" type="text/css" href="bower_components/radar-chart-d3/src/radar-chart.css">
   <link href="styles/app.css" rel="stylesheet">
 
   <!-- Javascript -->
@@ -17,8 +16,7 @@
   <script src="js/bootstrap.min.js"></script>
   <script src="js/underscore.min.js"></script>
   <script src="js/d3.min.js"></script>
-  <script src="bower_components/radar-chart-d3/src/radar-chart.js"></script>
-  <script src="js/dual.js"></script>
+  <script src="js/radar-chart.js"></script>
 
   <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
   <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
@@ -47,8 +45,8 @@
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
           <li><a href="index.html">Single Chart</a></li>
-          <li class="active"><a href="two-charts.html">Two Charts</a></li>
-          <li><a href="v1.html">Version 1.0</a></li>
+          <li><a href="two-charts.html">Two Charts</a></li>
+          <li class="active"><a href="v1.html">Version 1.0</a></li>
           <li><a href="http://tembot.me/">Tembot.me</a></li>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -61,37 +59,42 @@
     </div>
 
     <div class="row">
-      <div id="chartdiff" class="col-md-7"></div>
+      <div class="col-md-7">
+        <div id="chart"></div>
+      </div>
       <div class="col-md-5">
         <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
         <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
+        <blockquote>
+          <p><strong>Goal</strong> is to create a simple, reusable, json passable radar chart that takes in
+          the following values as an input, and have the ability to render multiple
+          radar charts, as well as have the ability to drag and see the data manipulation
+          in real time as the values are updated.</p>
+        </blockquote>
 
         <strong>Code:</strong>
         <pre>
-var data = [
-  {
-    className: 'germany', // optional can be used for styling
-    axes: [
-      {axis: "strength", value: 13, yOffset: 10},
-      {axis: "intelligence", value: 6},
-      {axis: "charisma", value: 5},
-      {axis: "dexterity", value: 9},
-      {axis: "luck", value: 2, xOffset: -20}
-    ]
-  },
-  {
-    className: 'argentina',
-    axes: [
-      {axis: "strength", value: 6},
-      {axis: "intelligence", value: 7},
-      {axis: "charisma", value: 10},
-      {axis: "dexterity", value: 13},
-      {axis: "luck", value: 9}
-    ]
-  }
-];
+//Data Example
+var data = [{
+  "className": "Name of the Class",
+  "normalize": true,
+  "scale_max": 20,
+  "drag": true
+  "axes" : [
+    {
+      "axis" : "name of axis",
+      "value": 4,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    },...
+  ]
+}]
+
+RadarChart.draw("#chart", data);
        </pre>
-       <button class="btn btn-default" id="render">Render</button>
       </div>
     </div>
   </div>
