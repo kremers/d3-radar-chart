@@ -5,7 +5,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>D3 Draggable Chart: Single Chart</title>
+  <title>D3 Draggable Chart: Version 1.0</title>
 
   <!-- Bootstrap -->
   <link rel="stylesheet" type="text/css" href="styles/bootstrap.min.css">
@@ -44,9 +44,9 @@
       <!-- Collect the nav links, forms, and other content for toggling -->
       <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
         <ul class="nav navbar-nav navbar-right">
-          <li class="active"><a href="index.html">Single Chart</a></li>
+          <li><a href="index.html">Single Chart</a></li>
           <li><a href="two-charts.html">Two Charts</a></li>
-          <li><a href="v1.html">Version 1.0</a></li>
+          <li class="active"><a href="v1.html">Version 1.0</a></li>
           <li><a href="http://tembot.me/">Tembot.me</a></li>
       </div><!-- /.navbar-collapse -->
     </div><!-- /.container-fluid -->
@@ -61,46 +61,40 @@
     <div class="row">
       <div class="col-md-7">
         <div id="chart"></div>
-        <div id="chartalt"></div>
       </div>
       <div class="col-md-5">
         <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
         <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
         <blockquote>
-          <p></p>
-          <footer> <a href="https://github.com/azole">azole</a> </footer>
+          <p><strong>Goal</strong> is to create a simple, reusable, json passable radar chart that takes in
+          the following values as an input, and have the ability to render multiple
+          radar charts, as well as have the ability to drag and see the data manipulation
+          in real time as the values are updated.</p>
         </blockquote>
 
         <strong>Code:</strong>
         <pre>
-//Single Data
-var data = [
-  {
-    className: 'argentina',
-    axes: [
-      {axis: "strength", value: 6},
-      {axis: "intelligence", value: 7},
-      {axis: "charisma", value: 10},
-      {axis: "dexterity", value: 8},
-      {axis: "luck", value: 9}
-    ]
-  },
-  {
-    className: 'germany',
-    axes: [
-      {axis: "strength", value: 13},
-      {axis: "intelligence", value: 16},
-      {axis: "charisma", value: 15},
-      {axis: "dexterity", value: 12},
-      {axis: "luck", value: 12}
-    ]
-  }
-];
+//Data Example
+var data = [{
+  "className": "Name of the Class",
+  "normalize": true,
+  "scale_max": 20,
+  "drag": true
+  "axes" : [
+    {
+      "axis" : "name of axis",
+      "value": 4,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    },...
+  ]
+}]
 
 RadarChart.draw("#chart", data);
        </pre>
-       <button id="toggle" class="btn btn-info">Toggle</button>
-       <div id="log"></div>
       </div>
     </div>
   </div>
