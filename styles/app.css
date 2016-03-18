@@ -34,3 +34,14 @@ blockquote {
 blockquote p {
   margin: 0;
 }
+#chart,
+#chartalt {
+  position: absolute;
+  top: 0;
+}
+#chart {
+  z-index: 0;
+}
+#chartalt {
+  z-index: 1;
+}
