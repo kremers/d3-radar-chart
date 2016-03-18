@@ -73,10 +73,10 @@ var RadarChart = {
       var slope, ratio = 0;
 
       if(old_pos.x === 0) {
-        new_pos.y =  old_pos.y - dy;
+        new_pos.y =  old_pos.y + dy;
         new_pos.value = (new_pos.y / old_pos.y ) * old_pos.value;
       } else {
-        slope = old_pos.y / old_pos.x;
+        slope = old_pos.y / old_pos.x; //y=mx+b -> if b = 0, m = y/x
         new_pos.x = dx + old_pos.x;
         new_pos.y = new_pos.x * slope;
         ratio = new_pos.x / old_pos.x;
