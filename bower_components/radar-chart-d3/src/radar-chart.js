@@ -19,6 +19,7 @@ var RadarChart = {
     backgroundTooltipColor: "#555",
     backgroundTooltipOpacity: "0.7",
     tooltipColor: "white",
+    ogData: [],
     axisJoin: function(d, i) {
       return d.className || i;
     },
