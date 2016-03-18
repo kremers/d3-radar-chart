@@ -156,8 +156,6 @@ $(document).ready(function(){
               config.h / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / config.maxValue) * config.factor * Math.cos(i * config.radians / total)),
             ];
           });
-        console.log(dataValues);
-        //dataValues[d[0].length] = dataValues[0];
       }
 
       // Initialization polygon

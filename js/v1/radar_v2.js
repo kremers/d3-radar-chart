@@ -181,6 +181,39 @@ RadarChart.prototype.renderPolygon = function(polygon) {
   });
 };
 
+RadarChart.prototype.renderNodes = function(data) {
+  // body...
+  var radar = this;
+  radar.graph.selectAll(".nodes")
+       .data(data.axes)
+       .enter()
+       .append("svg:circle").attr("class", getPolygonClassName(data.className))
+       .attr("r", radar.config.radius)
+       .attr("alt", function(axis){ 
+          return Math.max(axis.value, 0); 
+       })
+       .attr("cx", function(axis, index){
+          return radar.config.width / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength));
+       })
+       .attr("cy", function(axis, index){
+          return radar.config.height / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
+       })
+       .attr("data-id", function(axis){
+        return axis.axis;
+       })
+       .style("fill", radar.config.color(0))
+       .style("fill-opacity", 0.9)
+       .call(d3.behavior.drag().on("drag", radar.move))
+       .append("svg:title")
+       .text(function (data) {
+         return Math.max(data.value, 0);
+       });
+};
+
+RadarChart.prototype.move = function() {
+  // body...
+};
+
 //this function is the main driver of the application
 //given a radar chart and it's options, create & render
 //a multi-draggable radar chart
@@ -224,6 +257,7 @@ RadarChart.prototype.draw = function() {
       //render polygon
       var poly = radar_chart.generatePolygon(dataPoints);
       radar_chart.renderPolygon(poly);
+      radar_chart.renderNodes(radar);
    });
 
 };
