@@ -135,7 +135,6 @@ $(document).ready(function(){
 
   var radar = new RadarChart("#chart", data);
   radar.draw();
-  console.log(radar.config);
 
   /*var temp = new RadarChart('#temp', data, {radius: 5, width: 400, height: 400});
   temp.draw();

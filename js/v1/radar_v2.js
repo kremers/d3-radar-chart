@@ -65,10 +65,11 @@ RadarChart.prototype.computeRadius = function() {
 };
 
 RadarChart.prototype.drawFrame = function() {
-  // body...
-  console.log("Draw frame");
+  //to be added later for visual purposes of course
 };
 
+//this is designed to draw all unique axes that are passed in
+//even if the two radar charts have two different sets of data
 RadarChart.prototype.drawAxis = function() {
   // body...
   //generate the axis element
@@ -109,8 +110,21 @@ RadarChart.prototype.drawAxis = function() {
       .attr("y", function(axis, index){
         return radar.config.height / 2.0 * (1 - Math.cos(index * radar.config.radians / radar.totalAxisLength) + 20 * Math.cos(index * radar.config.radians / radar.totalAxisLength));
       });
+};
 
-  console.log("Draw axis - done");      
+RadarChart.prototype.calculatePoints = function(data) {
+  // body...
+  console.log("le data: " + data);
+};
+
+RadarChart.prototype.generatePolygon = function(dataPoints) {
+  // body...
+  console.log("les points du data: " + dataPoints);
+};
+
+RadarChart.prototype.renderPolygon = function(polygon) {
+  // body...
+  console.log("la polygon: " + polygon);
 };
 
 //initial render function
@@ -131,8 +145,22 @@ RadarChart.prototype.draw = function() {
                  .append("g");
 
   //draw the frame and the axis
-  this.drawFrame();
+  //this.drawFrame();
   this.drawAxis();
+
+
+  /* here's where it gets interesting
+   * to render either one or multiple polygons
+   * for each element in this.data
+   * calculate the data points
+   * create a polygon based on those data points
+   * add the two-string method based on the points
+   */
+
+   _.each(this.data, function(radar){
+      console.log(radar);
+   })
+
 };
 
 
