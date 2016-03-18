@@ -58,7 +58,10 @@
     </div>
 
     <div class="row">
-      <div id="chart" class="col-md-7"></div>
+      <div class="col-md-7">
+        <div id="chart"></div>
+        <div id="chartalt"></div>
+      </div>
       <div class="col-md-5">
         <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
         <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
@@ -86,6 +89,8 @@ var data = [
 
 RadarChart.draw("#chart", data);
        </pre>
+       <button id="toggle" class="btn btn-info">Toggle</button>
+       <div id="log"></div>
       </div>
     </div>
   </div>

@@ -27,11 +27,20 @@ $(document).ready(function(){
   //drag function is inside the bounds of the api, so I can move it from there
 
   //Initialize the Chart
+  RadarChart.defaultConfig.ogData = data;
+  console.log(RadarChart.defaultConfig.ogData);
   var chart = RadarChart.chart();
-  var svg = d3.select('#chart').append('svg')
+  var svg = d3.select('#chart')
+              .append('svg')
               .attr('width', 600)
-              .attr('height', 800);
+              .attr('height', 800)
+              .data(data);
 
   //Call the Chart and Render It
-  svg.append('g').classed('focus', 1).datum(data).call(chart);
+  svg.append('g').classed('lel', 1).datum(data).call(chart);
+
+  $('#render').click(function(){
+    console.log("rendering");
+  });
+
 });

@@ -19,6 +19,7 @@ var RadarChart = {
     backgroundTooltipColor: "#555",
     backgroundTooltipOpacity: "0.7",
     tooltipColor: "white",
+    ogData: [],
     axisJoin: function(d, i) {
       return d.className || i;
     },
@@ -67,32 +68,26 @@ var RadarChart = {
                  .drag()
                  .origin(function(d) { return d; })
                  .on("drag", dragAlt);
-    function dragNode(elem){
-      var target =  d3.select(elem);
-      var tar_obj = target[0][0][0];
-      var old_pos = {x: tar_obj.x, y: tar_obj.y};
-      var new_pos = {x: 0, y: 0};
-      var new_val = 0;
+    function updateNode(d, dx, dy){
+      var old_pos = {x: d.x, y: d.y, value: d.value};
+      var new_pos = {x: 0, y: 0, value: 0};
+      var slope, ratio = 0;
 
       if(old_pos.x === 0) {
-        new_pos.x =  old_pos.x - d3.event.y;
-        new_val = (new_pos.y / old_pos.y ) * tar_obj.value;
+        new_pos.y =  old_pos.y + dy;
+        new_pos.value = (new_pos.y / old_pos.y ) * old_pos.value;
       } else {
-
-        var slope = old_pos.y / old_pos.x;
-        new_pos.x = d3.event.x + old_pos.x - 300;
+        slope = old_pos.y / old_pos.x; //y=mx+b -> if b = 0, m = y/x
+        new_pos.x = dx + old_pos.x;
         new_pos.y = new_pos.x * slope;
-        var ratio = new_pos.x / old_pos.x;
-        new_val = ratio * tar_obj.value;
+        ratio = new_pos.x / old_pos.x;
+        new_pos.value = ratio * old_pos.value;
       }
-
-      tar_obj.x = new_pos.x + 300;
-      tar_obj.y = 300 - new_pos.y;
-      tar_obj.value = new_val;
-
-      target.x = tar_obj.x;
-      target.y = tar_obj.y;
-      target.value = tar_obj.value;
+      console.log(new_pos);
+      return new_pos;
+    }
+    function updatePolygon(hai) {
+      console.log("yolo");
     }
     function radar(selection) {
       selection.each(function(data) {
@@ -325,8 +320,6 @@ var RadarChart = {
 
           circle.enter().append('circle')
             .classed({circle: 1, 'd3-enter': 1})
-            .attr("cx", function(d) { return d.x; })
-            .attr("cy", function(d) { return d.y; })
             .call(drag);
             /*.on('mouseover', function(dd){
               d3.event.stopPropagation();
