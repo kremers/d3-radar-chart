@@ -1,12 +1,12 @@
 $(document).ready(function(){
   var data = [{
-    "className": "Example A",
+    "className": "example_a",
     "normalize": true,
     "scale_max": 20,
     "axes" : [
       {
         "axis" : "axis_one",
-        "value": 4,
+        "value": 5,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -26,7 +26,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_three",
-        "value": 7,
+        "value": 5,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -36,7 +36,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_four",
-        "value": 3,
+        "value": 5,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -46,7 +46,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_five",
-        "value": 4,
+        "value": 5,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -56,7 +56,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_six",
-        "value": 4,
+        "value": 5,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -72,7 +72,7 @@ $(document).ready(function(){
     "axes" : [
       {
         "axis" : "axis_one",
-        "value": 4,
+        "value": 7,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -92,7 +92,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_three",
-        "value": 7,
+        "value": 6,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -112,7 +112,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_five",
-        "value": 4,
+        "value": 11,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
@@ -122,7 +122,7 @@ $(document).ready(function(){
       },
       {
         "axis" : "axis_six",
-        "value": 4,
+        "value": 8,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,

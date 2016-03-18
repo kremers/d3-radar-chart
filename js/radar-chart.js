@@ -156,7 +156,8 @@ $(document).ready(function(){
               config.h / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / config.maxValue) * config.factor * Math.cos(i * config.radians / total)),
             ];
           });
-        dataValues[d[0].length] = dataValues[0];
+        console.log(dataValues);
+        //dataValues[d[0].length] = dataValues[0];
       }
 
       // Initialization polygon
@@ -530,7 +531,7 @@ $(document).ready(function(){
     }
   };
 
-  RadarChart_alt.draw("#chartalt", lol);
+  //RadarChart_alt.draw("#chartalt", lol);
 
   $("#toggle").click(function(){
 

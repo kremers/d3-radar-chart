@@ -1,6 +1,15 @@
 //Radar Chart Tembot v1
 //pre-requisite: underscore.js
 
+
+/*
+ * Random Helper Functions
+ */
+
+function getPolygonClassName(className){
+  return className + "-radar";
+}
+
 /*
  * Prototypes and Public functions
  */
@@ -114,39 +123,71 @@ RadarChart.prototype.drawAxis = function() {
 
 RadarChart.prototype.calculatePoints = function(data) {
   // body...
-  console.log("le data: " + data);
+  var dataValues = [];
+  var radar = this;
+  radar.graph.selectAll(".nodes")
+      .data(data, function(axis, index){
+        dataValues[index] = [
+          radar.config.width / 2 * (1 - (parseFloat(Math.max(axis.value, 0)) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
+          radar.config.height / 2 * (1 - (parseFloat(Math.max(axis.value, 0)) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength))
+        ]
+      });
+  return dataValues;
 };
 
 RadarChart.prototype.generatePolygon = function(dataPoints) {
-  // body...
-  console.log("les points du data: " + dataPoints);
+  var radar = this;
+  var polygon = radar.graph.selectAll("area")
+                     .data([dataPoints.data])
+                     .enter()
+                     .append("polygon")
+                     .attr("class", getPolygonClassName(dataPoints.className))
+                     .style("stroke-width", "2px")
+                     .style("stroke", radar.config.color(0))
+                     .on("mouseover", function(object){
+                        element = "polygon." + d3.select(this).attr("class");
+                        radar.graph.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
+                        radar.graph.selectAll(element).transition(200).style("fill-opacity", 0.7);
+                     })
+                     .on("mouseout", function(){
+                      radar.graph.selectAll("polygon").transition(200).style("fill-opacity", radar.config.opacityArea);
+                     })
+                     .style("fill", function(data, index){ return radar.config.color(0); })
+                     .style("fill-opacity", radar.config.opacityArea);
+  return polygon;
 };
 
 RadarChart.prototype.renderPolygon = function(polygon) {
-  // body...
-  console.log("la polygon: " + polygon);
+  polygon.attr("points", function(data){
+    var string =  "";
+    for(var index = 0; index < data.length; index++){
+      string = string + data[index][0] + "," + data[index][1] + " ";
+    }
+    return string;
+  });
 };
 
 //initial render function
 RadarChart.prototype.draw = function() {
-  this.updateConfiguration(this.options);
-  this.updateScale();
-  this.addAxisNames();
-  this.computeRadius();
+  var radar_chart = this;
+  radar_chart.updateConfiguration(radar_chart.options);
+  radar_chart.updateScale();
+  radar_chart.addAxisNames();
+  radar_chart.computeRadius();
 
   //get rid of any remaining svgs
-  d3.select(this.id).select("svg").remove();
+  d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
   this.graph = d3.select(this.id)
                  .append("svg")
-                 .attr("width", this.config.width)
-                 .attr("height", this.config.height)
+                 .attr("width", radar_chart.config.width)
+                 .attr("height", radar_chart.config.height)
                  .append("g");
 
   //draw the frame and the axis
-  //this.drawFrame();
-  this.drawAxis();
+  //radar_chart.drawFrame();
+  radar_chart.drawAxis();
 
 
   /* here's where it gets interesting
@@ -157,9 +198,17 @@ RadarChart.prototype.draw = function() {
    * add the two-string method based on the points
    */
 
-   _.each(this.data, function(radar){
-      console.log(radar);
-   })
+   _.each(radar_chart.data, function(radar){
+      //generate data points
+      var dataPoints = {
+        className: radar.className,
+        data : radar_chart.calculatePoints(radar.axes)
+      };
+
+      //render polygon
+      var poly = radar_chart.generatePolygon(dataPoints);
+      radar_chart.renderPolygon(poly);
+   });
 
 };
 
