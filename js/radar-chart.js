@@ -333,7 +333,7 @@ $(document).ready(function(){
             .attr("y2", function(d, i) {
               return levelFactor * (1 - config.factor * Math.cos((i + 1) * config.radians / total));
             })
-            .attr("class", "line").style("stroke", "white").style("stroke-width", "0.5px").attr("transform", "translate(" + (config.w / 2 - levelFactor) + ", " + (config.h / 2 - levelFactor) + ")");;
+            .attr("class", "line").style("stroke", "grey").style("stroke-width", "0.5px").attr("transform", "translate(" + (config.w / 2 - levelFactor) + ", " + (config.h / 2 - levelFactor) + ")");;
         }
       }
 
@@ -355,7 +355,7 @@ $(document).ready(function(){
             maxAxisValues[i].y = config.h / 2 * (1 - config.factor * Math.cos(i * config.radians / total));
             return maxAxisValues[i].y;
           })
-          .attr("class", "line").style("stroke", "white").style("stroke-width", "1px");
+          .attr("class", "line").style("stroke", "grey").style("stroke-width", "1px");
       }
 
       // Calculated based on the input data points to draw a polygon

@@ -66,25 +66,34 @@
         <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
         <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
         <blockquote>
-          <p>This function generates a new array with 3 objects every time.</p>
-          <p>The values for each axis are randomized.</p>
-          <p>In order to re-generate the radar chart, you jsut need to run.</p>
-          <p><code>RadarChart.draw("#chart2", data)</code> as usual.</p>
+          <p></p>
           <footer> <a href="https://github.com/azole">azole</a> </footer>
         </blockquote>
 
         <strong>Code:</strong>
         <pre>
-//Single Axis Data
-
+//Single Data
 var data = [
-     {axis: "strength", value: 12, order: 0},
-     {axis: "intelligence", value: 1, order: 1},
-     {axis: "charisma", value: 8, order: 2},
-     {axis: "dexterity", value: 4, order: 3},
-     {axis: "luck", value: 10, order: 4},
-     {axis: "agility", value: 10, order: 5}
+  {
+    className: 'argentina',
+    axes: [
+      {axis: "strength", value: 6},
+      {axis: "intelligence", value: 7},
+      {axis: "charisma", value: 10},
+      {axis: "dexterity", value: 8},
+      {axis: "luck", value: 9}
     ]
+  },
+  {
+    className: 'germany',
+    axes: [
+      {axis: "strength", value: 13},
+      {axis: "intelligence", value: 16},
+      {axis: "charisma", value: 15},
+      {axis: "dexterity", value: 12},
+      {axis: "luck", value: 12}
+    ]
+  }
 ];
 
 RadarChart.draw("#chart", data);
