@@ -60,8 +60,8 @@ var RadarChart = {
     }
     function dragAlt(d){
       d3.select(this)
-        .attr('cx', d[0].x = updateNode(d[0], d3.event.dx, d3.event.dy).x)
-        .attr('cy', d[0].y = updateNode(d[0], d3.event.dx, d3.event.dy).y);
+        .attr('cx', d[0].x = d[0].x + d3.event.dx)
+        .attr('cy', d[0].y = d[0].y + d3.event.dy);
     }
     var drag = d3.behavior
                  .drag()
@@ -85,10 +85,8 @@ var RadarChart = {
       console.log(new_pos);
       return new_pos;
     }
-    function updatePolygon (elem) {
-      console.log(this.RadarChart);
-      this.RadarChart.draw();
-      console.log("bablam");
+    function updatePolygon(hai) {
+      console.log("yolo");
     }
     function radar(selection) {
       selection.each(function(data) {
