@@ -113,7 +113,7 @@ $(document).ready(function(){
         }
       }
 
-      // Axis
+      // these draw and bind the axis elements for the data in use. 
       function drawAxis() {
         var axis = g.selectAll(".axis").data(allAxis).enter().append("g").attr("class", "axis");
 
@@ -149,7 +149,6 @@ $(document).ready(function(){
 
       // Calculated based on the input data points to draw a polygon
       function reCalculatePoints() {
-        var obj = []
         g.selectAll(".nodes")
           .data(d, function(j, i) {
             dataValues[i] = [
