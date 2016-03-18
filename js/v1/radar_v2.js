@@ -38,7 +38,8 @@ function RadarChart(id, data, options){
   };
 }
 
-//update configuration
+//based on the options passed in by the user, 
+//update the configuration
 RadarChart.prototype.updateConfiguration = function(options) {
   if(options)
     for(var i in options){
@@ -46,7 +47,8 @@ RadarChart.prototype.updateConfiguration = function(options) {
     }
 };
 
-//based on the data passed in, update the scale
+//based on the data passed in 
+//update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
   var max_array = [];
 
@@ -58,8 +60,9 @@ RadarChart.prototype.updateScale = function() {
   this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
 };
 
+// binds the arrays and the number of total axes 
+//to the Radar chart object
 RadarChart.prototype.addAxisNames = function() {
-  // body...
   var axisNames = [];
   _.each(this.data, function(radar){
     _.each(radar.axes, function(axis){ axisNames.push(axis.axis); });
@@ -69,6 +72,7 @@ RadarChart.prototype.addAxisNames = function() {
   this.totalAxisLength = this.axisNames.length;
 };
 
+//binds the radar radius to the RadarChart
 RadarChart.prototype.computeRadius = function() {
   this.radarRadius = this.config.factor * Math.min(this.config.width / 2.0, this.config.height / 2.0);
 };
@@ -108,6 +112,8 @@ RadarChart.prototype.drawAxis = function() {
       .style("stroke", "#7f8c8d")
       .style("stroke-width", "1px");
 
+  //this will be used for the tooltips so that lables
+  //and legends can be added to the chart for better viewing
   axis.append("text")
       .text(function(axis){return axis;})
       .style("font-family", "Helvetica")
@@ -121,8 +127,11 @@ RadarChart.prototype.drawAxis = function() {
       });
 };
 
+
+//for a given radar chart, this calculates the data points required
+//returns a double array of the x & y coordinates
 RadarChart.prototype.calculatePoints = function(data) {
-  // body...
+  
   var dataValues = [];
   var radar = this;
   radar.graph.selectAll(".nodes")
@@ -135,6 +144,9 @@ RadarChart.prototype.calculatePoints = function(data) {
   return dataValues;
 };
 
+//for a data points object (bounded by the datapoints class name)
+//create a new polygon object
+//returns the generated polygon
 RadarChart.prototype.generatePolygon = function(dataPoints) {
   var radar = this;
   var polygon = radar.graph.selectAll("area")
@@ -157,6 +169,8 @@ RadarChart.prototype.generatePolygon = function(dataPoints) {
   return polygon;
 };
 
+//for a given polygon, return a string of points generated from recalulate points
+//this is the actual function that renders the polygon on top
 RadarChart.prototype.renderPolygon = function(polygon) {
   polygon.attr("points", function(data){
     var string =  "";
@@ -167,7 +181,9 @@ RadarChart.prototype.renderPolygon = function(polygon) {
   });
 };
 
-//initial render function
+//this function is the main driver of the application
+//given a radar chart and it's options, create & render
+//a multi-draggable radar chart
 RadarChart.prototype.draw = function() {
   var radar_chart = this;
   radar_chart.updateConfiguration(radar_chart.options);
