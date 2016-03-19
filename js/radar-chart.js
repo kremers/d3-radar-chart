@@ -239,6 +239,7 @@ $(document).ready(function(){
       function move(dobj, i) {
         this.parentNode.appendChild(this);
         var dragTarget = d3.select(this);
+        console.log(dragTarget.data());
 
         var oldData = dragTarget.data()[0];
         // Displacement coordinates are zero, in order to facilitate the calculation of the slope

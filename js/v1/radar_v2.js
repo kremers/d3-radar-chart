@@ -210,8 +210,48 @@ RadarChart.prototype.renderNodes = function(data) {
        });
 };
 
-RadarChart.prototype.move = function() {
+RadarChart.prototype.move = function(axis, index) {
   // body...
+  this.parentNode.appendChild(this);
+  var target = d3.select(this);
+  var oldData = target.data()[0];
+
+  var oldX = parseFloat(target.attr("cx")) - 300;
+  var oldY = 300 - parseFloat(target.attr("cy"));
+  var newY = 0, newX = 0, newVal = 0;
+
+  // Infinite slope special case
+  if (oldX == 0) {
+    newY = oldY - d3.event.dy;
+    newValue = (newY / oldY) * oldData.value;
+  } else {
+    var slope = oldY / oldX;
+    newX = d3.event.dx + parseFloat(target.attr("cx")) - 300;
+    newY = newX * slope;
+
+    //Using the concept of similar triangles to calculate the new value of the geometric
+    var ratio = newX / oldX;
+    newValue = ratio * oldData.value;
+  }
+
+  target.attr("cx", function(){ return newX + 300; })
+        .attr("cy", function(){ return 300 - newY; });
+};
+
+RadarChart.prototype.update = function() {
+  var radar_chart = this;
+  _.each(radar_chart.data, function(radar){
+      //generate data points
+      var dataPoints = {
+        className: radar.className,
+        data : radar_chart.calculatePoints(radar.axes)
+      };
+
+      //render polygon
+      var poly = radar_chart.generatePolygon(dataPoints);
+      radar_chart.renderPolygon(poly);
+      radar_chart.renderNodes(radar);
+   });
 };
 
 //this function is the main driver of the application
@@ -238,15 +278,6 @@ RadarChart.prototype.draw = function() {
   //radar_chart.drawFrame();
   radar_chart.drawAxis();
 
-
-  /* here's where it gets interesting
-   * to render either one or multiple polygons
-   * for each element in this.data
-   * calculate the data points
-   * create a polygon based on those data points
-   * add the two-string method based on the points
-   */
-
    _.each(radar_chart.data, function(radar){
       //generate data points
       var dataPoints = {
@@ -261,5 +292,7 @@ RadarChart.prototype.draw = function() {
    });
 
 };
+
+
 
 
