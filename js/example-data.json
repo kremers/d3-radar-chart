@@ -1,0 +1,50 @@
+[{
+  "className": "Name of the Class",
+  "axes" : [
+    {
+      "axis" : "name of axis",
+      "value": 0,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    },
+    {
+      "axis" : "name of axis",
+      "value": 0,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    },
+    {
+      "axis" : "name of axis",
+      "value": 0,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    },
+    {
+      "axis" : "name of axis",
+      "value": 0,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    },
+    {
+      "axis" : "name of axis",
+      "value": 0,
+      "abs_min" : 0,
+      "min" : 0,
+      "abs_max" : 10,
+      "max" : 10,
+      "step": 1
+    }
+  ]
+}]

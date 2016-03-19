@@ -18,7 +18,11 @@ $(document).ready(function(){
   ];
 
   var RadarChart = {
+
+    //main function: takes in the id of the dom element,
+    //the data as d, and any extra option
     draw: function(id, d, options) {
+
       var config = {
         radius: 6, // Radius Point
         w: 600,
@@ -31,6 +35,9 @@ $(document).ready(function(){
         opacityArea: 0.5,
         color: d3.scale.category10()
       };
+
+      // if a user passes in some option, update the base config 
+      // to use them
       if ('undefined' !== typeof options) {
         for (var i in options) {
           if ('undefined' !== typeof options[i]) {
@@ -39,33 +46,53 @@ $(document).ready(function(){
         }
       }
 
+      //set the axis max length to either the default config or the max 
+      //value from the data passed in
       config.maxValue = Math.max(config.maxValue, d3.max(d.map(function(o) {
         return o.value
       })));
+
+      //keep track of all the axis elements in question
       var allAxis = (d.map(function(i, j) {
         return i.axis
       }));
+
       var total = allAxis.length;
       var radius = config.factor * Math.min(config.w / 2, config.h / 2);
 
-      // Initialization canvas
+      // If an svg already exists in the dom, drop it
       d3.select(id).select("svg").remove();
+
+      //create a new svg element with the passed in width and height props
+      //g should be somewhat accesible by RadarChart (could prove useful for extracting data)
       var g = d3.select(id).append("svg").attr("width", config.w).attr("height", config.h).append("g");
 
+      //for on hover actions
       var tooltip;
-
       drawFrame();
-      var maxAxisValues = []; // The axis of maximum values x, y
-      var minAxisValues = []; // need to figure this out
+
+      // The axis of maximum values x, y
+      var maxAxisValues = []; 
+      var minAxisValues = []; 
       drawAxis();
 
+      // where the data iself sits. this is burried inside of draw which i hate since
+      // it makes it non-accessible. this should be a property of 
       var dataValues = [];
       reCalculatePoints();
+      
+      //this should also be accessible
       var areagg = initPolygon();
+
       drawPoly();
       drawnode();
 
-      // box
+      //this needs an init function that collects all the functions and data
+      //binds them to the radar chart object, and runs the required methods
+      //init();
+
+      //this is repsonsible for drawing the frame of the box [X] like the hexagon
+      //that we see (we'll keep this optional)
       function drawFrame() {
         for (var j = 0; j < config.levels; j++) {
           var levelFactor = config.factor * radius * ((j + 1) / config.levels);
@@ -86,7 +113,7 @@ $(document).ready(function(){
         }
       }
 
-      // Axis
+      // these draw and bind the axis elements for the data in use. 
       function drawAxis() {
         var axis = g.selectAll(".axis").data(allAxis).enter().append("g").attr("class", "axis");
 
@@ -122,7 +149,6 @@ $(document).ready(function(){
 
       // Calculated based on the input data points to draw a polygon
       function reCalculatePoints() {
-        var obj = []
         g.selectAll(".nodes")
           .data(d, function(j, i) {
             dataValues[i] = [
@@ -130,7 +156,6 @@ $(document).ready(function(){
               config.h / 2 * (1 - (parseFloat(Math.max(j.value, 0)) / config.maxValue) * config.factor * Math.cos(i * config.radians / total)),
             ];
           });
-        dataValues[d[0].length] = dataValues[0];
       }
 
       // Initialization polygon
@@ -214,6 +239,7 @@ $(document).ready(function(){
       function move(dobj, i) {
         this.parentNode.appendChild(this);
         var dragTarget = d3.select(this);
+        console.log(dragTarget.data());
 
         var oldData = dragTarget.data()[0];
         // Displacement coordinates are zero, in order to facilitate the calculation of the slope
@@ -333,7 +359,7 @@ $(document).ready(function(){
             .attr("y2", function(d, i) {
               return levelFactor * (1 - config.factor * Math.cos((i + 1) * config.radians / total));
             })
-            .attr("class", "line").style("stroke", "white").style("stroke-width", "0.5px").attr("transform", "translate(" + (config.w / 2 - levelFactor) + ", " + (config.h / 2 - levelFactor) + ")");;
+            .attr("class", "line").style("stroke", "grey").style("stroke-width", "0.5px").attr("transform", "translate(" + (config.w / 2 - levelFactor) + ", " + (config.h / 2 - levelFactor) + ")");;
         }
       }
 
@@ -355,7 +381,7 @@ $(document).ready(function(){
             maxAxisValues[i].y = config.h / 2 * (1 - config.factor * Math.cos(i * config.radians / total));
             return maxAxisValues[i].y;
           })
-          .attr("class", "line").style("stroke", "white").style("stroke-width", "1px");
+          .attr("class", "line").style("stroke", "grey").style("stroke-width", "1px");
       }
 
       // Calculated based on the input data points to draw a polygon
@@ -504,7 +530,7 @@ $(document).ready(function(){
     }
   };
 
-  RadarChart_alt.draw("#chartalt", lol);
+  //RadarChart_alt.draw("#chartalt", lol);
 
   $("#toggle").click(function(){
 
