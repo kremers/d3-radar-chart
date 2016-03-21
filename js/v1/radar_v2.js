@@ -5,12 +5,14 @@
 /*
  * Random Helper Functions
  */
- var globalRadar;
+
+var globalRadar; //not my greatest idea
 
 function getPolygonClassName(className){
   return className + "-radar";
 }
 
+//getters and setters for the radar object
 function setGlobalRadarObject(radar){
   globalRadar = radar;
 }
@@ -59,14 +61,16 @@ RadarChart.prototype.updateConfiguration = function(options) {
 //based on the data passed in 
 //update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
-  var max_array = [];
+  if(this.config.maxValue !== 0){
+    var max_array = [];
 
-  _.each(this.data, function(datum){
-    var result =_.max(datum.axes, function(axis){ return axis.value; });
-    max_array.push(result.value);
-  });
+    _.each(this.data, function(datum){
+      var result =_.max(datum.axes, function(axis){ return axis.value; });
+      max_array.push(result.value);
+    });
 
-  this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
+    this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
+  }
 };
 
 // binds the arrays and the number of total axes 
@@ -198,18 +202,14 @@ RadarChart.prototype.renderNodes = function(data) {
        .enter()
        .append("svg:circle").attr("class", getPolygonClassName(data.className))
        .attr("r", radar.config.radius)
-       .attr("alt", function(axis){ 
-          return Math.max(axis.value, 0); 
-       })
+       .attr("alt", function(axis){ return Math.max(axis.value, 0); })
        .attr("cx", function(axis, index){
           return radar.config.width / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength));
        })
        .attr("cy", function(axis, index){
           return radar.config.height / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
        })
-       .attr("data-id", function(axis){
-        return axis.axis;
-       })
+       .attr("data-id", function(axis){ return axis.axis; })
        .attr("circle-class", data.className)
        .style("fill", radar.config.color(0))
        .style("fill-opacity", 0.9)
@@ -251,17 +251,16 @@ RadarChart.prototype.move = function(axis, index) {
   target.attr("cx", function(){ return newX + 300; })
         .attr("cy", function(){ return 300 - newY; });
 
-  //after updating the CX and CY of the circle selected
-  //update the value in question
-  //call the update function
 
-  //console.log(radar_chart);
 
+  //here we go
+  //"this" is bound to the circle dom element so that
+  //we can compute the dx and dy
+  //using the global accessor, we can change the associated value
+  //for a particular 
   var data_chart = _.find(radar_chart.data, function(chart){
     return chart.className === target.attr("circle-class");
   });
-
-  //console.log(data_chart);
 
   _.each(data_chart.axes, function(a){
     if(a.axis === axis.axis)
@@ -281,6 +280,7 @@ RadarChart.prototype.move = function(axis, index) {
 RadarChart.prototype.update = function() {
   var radar_chart = this;
   //get rid of any remaining svgs
+  radar_chart.addAxisNames();
   d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
@@ -300,7 +300,6 @@ RadarChart.prototype.update = function() {
       //render polygon
       var poly = radar_chart.generatePolygon(dataPoints);
       radar_chart.renderPolygon(poly);
-      radar_chart.renderNodes(radar);
    });
 };
 
@@ -346,7 +345,3 @@ RadarChart.prototype.draw = function() {
    });
 
 };
-
-
-
-
