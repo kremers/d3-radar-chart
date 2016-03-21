@@ -68,7 +68,7 @@ RadarChart.prototype.updateScale = function() {
     max_array.push(result.value);
   });
 
-  this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
+  this.config.maxValue = 20;
 };
 
 // binds the arrays and the number of total axes 
@@ -211,6 +211,7 @@ RadarChart.prototype.renderNodes = function(data) {
        .attr("circle-class", data.className)
        .style("fill", radar.config.color(0))
        .style("fill-opacity", 0.9)
+       .call(d3.behavior.drag().on("drag", radar.move))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
@@ -270,14 +271,17 @@ RadarChart.prototype.move = function(axis, index) {
   });
 
   setGlobalRadarObject(radar_chart);
-  radar_chart.draw();
+  radar_chart.update();
 
 };
 
 RadarChart.prototype.update = function() {
   var radar_chart = this;
   //get rid of any remaining svgs
+
+  radar_chart.updateScale();
   radar_chart.addAxisNames();
+  radar_chart.computeRadius();
   d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
@@ -285,7 +289,9 @@ RadarChart.prototype.update = function() {
                         .append("svg")
                         .attr("width", radar_chart.config.width)
                         .attr("height", radar_chart.config.height)
-                        .append("g");
+                        .append("g"); 
+
+  radar_chart.drawAxis();
 
   _.each(radar_chart.data, function(radar){
       //generate data points
@@ -297,6 +303,7 @@ RadarChart.prototype.update = function() {
       //render polygon
       var poly = radar_chart.generatePolygon(dataPoints);
       radar_chart.renderPolygon(poly);
+      radar_chart.renderNodes(radar);
    });
 };
 
