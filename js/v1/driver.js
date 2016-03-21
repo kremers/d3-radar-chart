@@ -66,7 +66,7 @@ $(document).ready(function(){
       }
     ]
   },{
-    "className": "Example B",
+    "className": "example_b",
     "normalize": true,
     "scale_max": 20,
     "axes" : [
