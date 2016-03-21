@@ -5,9 +5,18 @@
 /*
  * Random Helper Functions
  */
+ var globalRadar;
 
 function getPolygonClassName(className){
   return className + "-radar";
+}
+
+function setGlobalRadarObject(radar){
+  globalRadar = radar;
+}
+
+function getGlobalRadarObject(){
+  return globalRadar;
 }
 
 /*
@@ -201,22 +210,22 @@ RadarChart.prototype.renderNodes = function(data) {
        .attr("data-id", function(axis){
         return axis.axis;
        })
+       .attr("circle-class", data.className)
        .style("fill", radar.config.color(0))
        .style("fill-opacity", 0.9)
-       .call(
-          d3.behavior.drag()
-                     .origin(function(d) { return [d, radar];})
-                     .on("drag", radar.move)
-        )
+       .call(d3.behavior.drag().on("drag", radar.move))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
        });
 };
 
-RadarChart.prototype.move = function(d) {
+RadarChart.prototype.move = function(axis, index) {
   // body...
-  console.log(d);
+
+  //call global accessor - that way we can access the data and update it accordingly
+  var radar_chart = getGlobalRadarObject();
+
   this.parentNode.appendChild(this);
   var target = d3.select(this);
   var oldData = target.data()[0];
@@ -243,13 +252,44 @@ RadarChart.prototype.move = function(d) {
         .attr("cy", function(){ return 300 - newY; });
 
   //after updating the CX and CY of the circle selected
-  //update the value in question 
+  //update the value in question
   //call the update function
-  //console.log(axis);
+
+  //console.log(radar_chart);
+
+  var data_chart = _.find(radar_chart.data, function(chart){
+    return chart.className === target.attr("circle-class");
+  });
+
+  //console.log(data_chart);
+
+  _.each(data_chart.axes, function(a){
+    if(a.axis === axis.axis)
+      a.value = newValue;
+  });
+
+  _.each(radar_chart.data, function(chart){
+    if(chart.className === data_chart.className)
+      chart = data_chart;
+  });
+
+  setGlobalRadarObject(radar_chart);
+  radar_chart.draw();
+
 };
 
 RadarChart.prototype.update = function() {
   var radar_chart = this;
+  //get rid of any remaining svgs
+  d3.select(radar_chart.id).select("svg").remove();
+
+  //create the graph
+  radar_chart.graph = d3.select(radar_chart.id)
+                        .append("svg")
+                        .attr("width", radar_chart.config.width)
+                        .attr("height", radar_chart.config.height)
+                        .append("g");
+
   _.each(radar_chart.data, function(radar){
       //generate data points
       var dataPoints = {
@@ -268,6 +308,10 @@ RadarChart.prototype.update = function() {
 //given a radar chart and it's options, create & render
 //a multi-draggable radar chart
 RadarChart.prototype.draw = function() {
+
+  //set global accessor (mainly used in move function)
+  setGlobalRadarObject(this);
+
   var radar_chart = this;
   radar_chart.updateConfiguration(radar_chart.options);
   radar_chart.updateScale();
