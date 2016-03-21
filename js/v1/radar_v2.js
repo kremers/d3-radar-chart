@@ -198,18 +198,14 @@ RadarChart.prototype.renderNodes = function(data) {
        .enter()
        .append("svg:circle").attr("class", getPolygonClassName(data.className))
        .attr("r", radar.config.radius)
-       .attr("alt", function(axis){ 
-          return Math.max(axis.value, 0); 
-       })
+       .attr("alt", function(axis){ return Math.max(axis.value, 0); })
        .attr("cx", function(axis, index){
           return radar.config.width / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength));
        })
        .attr("cy", function(axis, index){
           return radar.config.height / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
        })
-       .attr("data-id", function(axis){
-        return axis.axis;
-       })
+       .attr("data-id", function(axis){ return axis.axis; })
        .attr("circle-class", data.className)
        .style("fill", radar.config.color(0))
        .style("fill-opacity", 0.9)
@@ -281,6 +277,7 @@ RadarChart.prototype.move = function(axis, index) {
 RadarChart.prototype.update = function() {
   var radar_chart = this;
   //get rid of any remaining svgs
+  radar_chart.addAxisNames();
   d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
@@ -300,7 +297,6 @@ RadarChart.prototype.update = function() {
       //render polygon
       var poly = radar_chart.generatePolygon(dataPoints);
       radar_chart.renderPolygon(poly);
-      radar_chart.renderNodes(radar);
    });
 };
 
