@@ -136,7 +136,8 @@ $(document).ready(function(){
   var config = {
     radius: 5, 
     width: 400, 
-    height: 400
+    height: 400,
+    maxValue: 20
   };
 
   var radar = new RadarChart("#chart", data, config);

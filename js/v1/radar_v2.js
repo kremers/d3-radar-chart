@@ -5,12 +5,14 @@
 /*
  * Random Helper Functions
  */
- var globalRadar;
+
+var globalRadar; //not my greatest idea
 
 function getPolygonClassName(className){
   return className + "-radar";
 }
 
+//getters and setters for the radar object
 function setGlobalRadarObject(radar){
   globalRadar = radar;
 }
@@ -59,14 +61,16 @@ RadarChart.prototype.updateConfiguration = function(options) {
 //based on the data passed in 
 //update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
-  var max_array = [];
+  if(this.config.maxValue !== 0){
+    var max_array = [];
 
-  _.each(this.data, function(datum){
-    var result =_.max(datum.axes, function(axis){ return axis.value; });
-    max_array.push(result.value);
-  });
+    _.each(this.data, function(datum){
+      var result =_.max(datum.axes, function(axis){ return axis.value; });
+      max_array.push(result.value);
+    });
 
-  this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
+    this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
+  }
 };
 
 // binds the arrays and the number of total axes 
@@ -247,17 +251,16 @@ RadarChart.prototype.move = function(axis, index) {
   target.attr("cx", function(){ return newX + 300; })
         .attr("cy", function(){ return 300 - newY; });
 
-  //after updating the CX and CY of the circle selected
-  //update the value in question
-  //call the update function
 
-  //console.log(radar_chart);
 
+  //here we go
+  //"this" is bound to the circle dom element so that
+  //we can compute the dx and dy
+  //using the global accessor, we can change the associated value
+  //for a particular 
   var data_chart = _.find(radar_chart.data, function(chart){
     return chart.className === target.attr("circle-class");
   });
-
-  //console.log(data_chart);
 
   _.each(data_chart.axes, function(a){
     if(a.axis === axis.axis)
@@ -342,7 +345,3 @@ RadarChart.prototype.draw = function() {
    });
 
 };
-
-
-
-
