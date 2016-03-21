@@ -203,15 +203,20 @@ RadarChart.prototype.renderNodes = function(data) {
        })
        .style("fill", radar.config.color(0))
        .style("fill-opacity", 0.9)
-       .call(d3.behavior.drag().on("drag", radar.move))
+       .call(
+          d3.behavior.drag()
+                     .origin(function(d) { return [d, radar];})
+                     .on("drag", radar.move)
+        )
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
        });
 };
 
-RadarChart.prototype.move = function(axis, index) {
+RadarChart.prototype.move = function(d) {
   // body...
+  console.log(d);
   this.parentNode.appendChild(this);
   var target = d3.select(this);
   var oldData = target.data()[0];
@@ -236,6 +241,11 @@ RadarChart.prototype.move = function(axis, index) {
 
   target.attr("cx", function(){ return newX + 300; })
         .attr("cy", function(){ return 300 - newY; });
+
+  //after updating the CX and CY of the circle selected
+  //update the value in question 
+  //call the update function
+  //console.log(axis);
 };
 
 RadarChart.prototype.update = function() {
@@ -268,11 +278,11 @@ RadarChart.prototype.draw = function() {
   d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
-  this.graph = d3.select(this.id)
-                 .append("svg")
-                 .attr("width", radar_chart.config.width)
-                 .attr("height", radar_chart.config.height)
-                 .append("g");
+  radar_chart.graph = d3.select(radar_chart.id)
+                        .append("svg")
+                        .attr("width", radar_chart.config.width)
+                        .attr("height", radar_chart.config.height)
+                        .append("g");
 
   //draw the frame and the axis
   //radar_chart.drawFrame();
