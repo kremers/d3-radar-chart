@@ -61,16 +61,14 @@ RadarChart.prototype.updateConfiguration = function(options) {
 //based on the data passed in 
 //update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
-  if(this.config.maxValue !== 0){
-    var max_array = [];
+  var max_array = [];
 
-    _.each(this.data, function(datum){
-      var result =_.max(datum.axes, function(axis){ return axis.value; });
-      max_array.push(result.value);
-    });
+  _.each(this.data, function(datum){
+    var result =_.max(datum.axes, function(axis){ return axis.value; });
+    max_array.push(result.value);
+  });
 
-    this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
-  }
+  this.config.maxValue = Math.max(this.config.maxValue, _.max(max_array, function(i){return i}));
 };
 
 // binds the arrays and the number of total axes 
@@ -213,7 +211,6 @@ RadarChart.prototype.renderNodes = function(data) {
        .attr("circle-class", data.className)
        .style("fill", radar.config.color(0))
        .style("fill-opacity", 0.9)
-       .call(d3.behavior.drag().on("drag", radar.move))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
