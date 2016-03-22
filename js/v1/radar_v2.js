@@ -74,12 +74,14 @@ RadarChart.prototype.updateScale = function() {
 // binds the arrays and the number of total axes 
 //to the Radar chart object
 RadarChart.prototype.addAxisNames = function() {
-  var axisNames = [];
+  var names = [];
   _.each(this.data, function(radar){
-    _.each(radar.axes, function(axis){ axisNames.push(axis.axis); });
+    _.each(radar.axes, function(axis){ names.push(axis.axis); });
   });
 
-  this.axisNames = _.uniq(axisNames);
+  this.axisNames = _.uniq(names, function(item){
+    return item;
+  });
   this.totalAxisLength = this.axisNames.length;
 };
 
@@ -228,6 +230,9 @@ RadarChart.prototype.move = function(axis, index) {
   var target = d3.select(this);
   var oldData = target.data()[0];
 
+  //console.log(radar_chart);
+  //console.log(axis);
+
   var oldX = parseFloat(target.attr("cx")) - 300;
   var oldY = 300 - parseFloat(target.attr("cy"));
   var newY = 0, newX = 0, newVal = 0;
@@ -261,13 +266,18 @@ RadarChart.prototype.move = function(axis, index) {
   });
 
   _.each(data_chart.axes, function(a){
-    if(a.axis === axis.axis)
+    if(a.axis === axis.axis){
+      console.log(radar_chart.data[0].axes[4].value);
       a.value = newValue;
+      console.log(radar_chart.data[0].axes[4].value);
+      console.log("done");
+    }
+      
   });
 
   _.each(radar_chart.data, function(chart){
     if(chart.className === data_chart.className)
-      chart = data_chart;
+      data_chart = chart;
   });
 
   setGlobalRadarObject(radar_chart);
@@ -279,9 +289,9 @@ RadarChart.prototype.update = function() {
   var radar_chart = this;
   //get rid of any remaining svgs
 
-  radar_chart.updateScale();
-  radar_chart.addAxisNames();
-  radar_chart.computeRadius();
+  //radar_chart.updateScale();
+  //radar_chart.addAxisNames();
+  //radar_chart.computeRadius();
   d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
