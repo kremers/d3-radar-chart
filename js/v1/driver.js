@@ -12,7 +12,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 0
       },
       {
         "axis" : "axis_two",
@@ -22,7 +23,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 1
       },
       {
         "axis" : "axis_three",
@@ -32,7 +34,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 2
       },
       {
         "axis" : "axis_four",
@@ -42,7 +45,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 3
       },
       {
         "axis" : "axis_five",
@@ -52,7 +56,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 4
       },
       {
         "axis" : "axis_six",
@@ -62,7 +67,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 5
       }
     ]
   },{
@@ -78,7 +84,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 0
       },
       {
         "axis" : "axis_two",
@@ -88,7 +95,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 1
       },
       {
         "axis" : "axis_three",
@@ -98,7 +106,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 2
       },
       {
         "axis" : "axis_four",
@@ -108,7 +117,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 3
       },
       {
         "axis" : "axis_five",
@@ -118,7 +128,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 4
       },
       {
         "axis" : "axis_six",
@@ -128,7 +139,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 5
       }
     ]
   }];

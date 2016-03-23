@@ -49,7 +49,7 @@ function RadarChart(id, data, options){
   };
 }
 
-//based on the options passed in by the user, 
+//based on the options passed in by the user,
 //update the configuration
 RadarChart.prototype.updateConfiguration = function(options) {
   if(options)
@@ -58,7 +58,7 @@ RadarChart.prototype.updateConfiguration = function(options) {
     }
 };
 
-//based on the data passed in 
+//based on the data passed in
 //update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
   var max_array = [];
@@ -71,7 +71,7 @@ RadarChart.prototype.updateScale = function() {
   this.config.maxValue = 20;
 };
 
-// binds the arrays and the number of total axes 
+// binds the arrays and the number of total axes
 //to the Radar chart object
 RadarChart.prototype.addAxisNames = function() {
   var names = [];
@@ -144,7 +144,7 @@ RadarChart.prototype.drawAxis = function() {
 //for a given radar chart, this calculates the data points required
 //returns a double array of the x & y coordinates
 RadarChart.prototype.calculatePoints = function(data) {
-  
+
   var dataValues = [];
   var radar = this;
   radar.graph.selectAll(".nodes")
@@ -230,20 +230,26 @@ RadarChart.prototype.move = function(axis, index) {
   var target = d3.select(this);
   var oldData = target.data()[0];
 
-  //console.log(radar_chart);
-  //console.log(axis);
+  console.log(radar_chart);
+  console.log(axis);
+
 
   var oldX = parseFloat(target.attr("cx")) - 300;
   var oldY = 300 - parseFloat(target.attr("cy"));
   var newY = 0, newX = 0, newVal = 0;
+  var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
 
   // Infinite slope special case
   if (oldX == 0) {
     newY = oldY - d3.event.dy;
+    if (Math.abs(newY) > Math.abs(maxY))
+      newY = maxY;
     newValue = (newY / oldY) * oldData.value;
   } else {
     var slope = oldY / oldX;
     newX = d3.event.dx + parseFloat(target.attr("cx")) - 300;
+    if (Math.abs(newX) > Math.abs(maxX))
+      newX = maxX;
     newY = newX * slope;
 
     //Using the concept of similar triangles to calculate the new value of the geometric
@@ -254,25 +260,23 @@ RadarChart.prototype.move = function(axis, index) {
   target.attr("cx", function(){ return newX + 300; })
         .attr("cy", function(){ return 300 - newY; });
 
-
-
   //here we go
   //"this" is bound to the circle dom element so that
   //we can compute the dx and dy
   //using the global accessor, we can change the associated value
-  //for a particular 
+  //for a particular
   var data_chart = _.find(radar_chart.data, function(chart){
     return chart.className === target.attr("circle-class");
   });
 
   _.each(data_chart.axes, function(a){
     if(a.axis === axis.axis){
-      console.log(radar_chart.data[0].axes[4].value);
+      //console.log(radar_chart.data[0].axes[4].value);
       a.value = newValue;
-      console.log(radar_chart.data[0].axes[4].value);
-      console.log("done");
+      //console.log(radar_chart.data[0].axes[4].value);
+      //console.log("done");
     }
-      
+
   });
 
   _.each(radar_chart.data, function(chart){
@@ -299,7 +303,7 @@ RadarChart.prototype.update = function() {
                         .append("svg")
                         .attr("width", radar_chart.config.width)
                         .attr("height", radar_chart.config.height)
-                        .append("g"); 
+                        .append("g");
 
   radar_chart.drawAxis();
 
