@@ -27,7 +27,7 @@ $(document).ready(function(){
         color: d3.scale.category10()
       };
 
-      // if a user passes in some option, update the base config 
+      // if a user passes in some option, update the base config
       // to use them
       if ('undefined' !== typeof options) {
         for (var i in options) {
@@ -37,7 +37,7 @@ $(document).ready(function(){
         }
       }
 
-      //set the axis max length to either the default config or the max 
+      //set the axis max length to either the default config or the max
       //value from the data passed in
       config.maxValue = Math.max(config.maxValue, d3.max(d.map(function(o) {
         return o.value
@@ -63,15 +63,15 @@ $(document).ready(function(){
       drawFrame();
 
       // The axis of maximum values x, y
-      var maxAxisValues = []; 
-      var minAxisValues = []; 
+      var maxAxisValues = [];
+      var minAxisValues = [];
       drawAxis();
 
       // where the data iself sits. this is burried inside of draw which i hate since
-      // it makes it non-accessible. this should be a property of 
+      // it makes it non-accessible. this should be a property of
       var dataValues = [];
       reCalculatePoints();
-      
+
       //this should also be accessible
       var areagg = initPolygon();
 
@@ -104,7 +104,7 @@ $(document).ready(function(){
         }
       }
 
-      // these draw and bind the axis elements for the data in use. 
+      // these draw and bind the axis elements for the data in use.
       function drawAxis() {
         var axis = g.selectAll(".axis").data(allAxis).enter().append("g").attr("class", "axis");
 

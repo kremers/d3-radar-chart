@@ -123,7 +123,7 @@ RadarChart.prototype.drawAxis = function() {
       })
       .attr("class", "line")
       .style("stroke", "#7f8c8d")
-      .style("stroke-width", "1px");
+      .style("stroke-width", "2px");
 
   //this will be used for the tooltips so that lables
   //and legends can be added to the chart for better viewing
@@ -160,7 +160,7 @@ RadarChart.prototype.calculatePoints = function(data) {
 //for a data points object (bounded by the datapoints class name)
 //create a new polygon object
 //returns the generated polygon
-RadarChart.prototype.generatePolygon = function(dataPoints) {
+RadarChart.prototype.generatePolygon = function(dataPoints, index) {
   var radar = this;
   var polygon = radar.graph.selectAll("area")
                      .data([dataPoints.data])
@@ -168,7 +168,7 @@ RadarChart.prototype.generatePolygon = function(dataPoints) {
                      .append("polygon")
                      .attr("class", getPolygonClassName(dataPoints.className))
                      .style("stroke-width", "2px")
-                     .style("stroke", radar.config.color(0))
+                     .style("stroke", radar.config.color(index))
                      .on("mouseover", function(object){
                         element = "polygon." + d3.select(this).attr("class");
                         radar.graph.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
@@ -177,7 +177,7 @@ RadarChart.prototype.generatePolygon = function(dataPoints) {
                      .on("mouseout", function(){
                       radar.graph.selectAll("polygon").transition(200).style("fill-opacity", radar.config.opacityArea);
                      })
-                     .style("fill", function(data, index){ return radar.config.color(0); })
+                     .style("fill", function(data, i){ return radar.config.color(index); })
                      .style("fill-opacity", radar.config.opacityArea);
   return polygon;
 };
@@ -194,7 +194,7 @@ RadarChart.prototype.renderPolygon = function(polygon) {
   });
 };
 
-RadarChart.prototype.renderNodes = function(data) {
+RadarChart.prototype.renderNodes = function(data, index) {
   // body...
   var radar = this;
   radar.graph.selectAll(".nodes")
@@ -211,7 +211,7 @@ RadarChart.prototype.renderNodes = function(data) {
        })
        .attr("data-id", function(axis){ return axis.axis; })
        .attr("circle-class", data.className)
-       .style("fill", radar.config.color(0))
+       .style("fill", radar.config.color(index))
        .style("fill-opacity", 0.9)
        .call(d3.behavior.drag().on("drag", radar.move))
        .append("svg:title")
@@ -242,14 +242,16 @@ RadarChart.prototype.move = function(axis, index) {
   // Infinite slope special case
   if (oldX == 0) {
     newY = oldY - d3.event.dy;
-    if (Math.abs(newY) > Math.abs(maxY))
+    if (Math.abs(newY) > Math.abs(maxY)){
       newY = maxY;
+    }
     newValue = (newY / oldY) * oldData.value;
   } else {
     var slope = oldY / oldX;
     newX = d3.event.dx + parseFloat(target.attr("cx")) - 300;
-    if (Math.abs(newX) > Math.abs(maxX))
+    if (Math.abs(newX) > Math.abs(maxX)){
       newX = maxX;
+    }
     newY = newX * slope;
 
     //Using the concept of similar triangles to calculate the new value of the geometric
@@ -349,17 +351,16 @@ RadarChart.prototype.draw = function() {
   //radar_chart.drawFrame();
   radar_chart.drawAxis();
 
-   _.each(radar_chart.data, function(radar){
-      //generate data points
+   _.each(radar_chart.data, function(radar, index){
       var dataPoints = {
         className: radar.className,
         data : radar_chart.calculatePoints(radar.axes)
       };
 
       //render polygon
-      var poly = radar_chart.generatePolygon(dataPoints);
+      var poly = radar_chart.generatePolygon(dataPoints, index);
       radar_chart.renderPolygon(poly);
-      radar_chart.renderNodes(radar);
+      radar_chart.renderNodes(radar, index);
    });
 
 };

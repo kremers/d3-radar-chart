@@ -152,7 +152,7 @@ $(document).ready(function(){
     maxValue: 20
   };
 
-  var radar = new RadarChart("#chart", data);
+  var radar = new RadarChart("#chart", data, config);
   radar.draw();
 
   /*var temp = new RadarChart('#temp', data, {radius: 5, width: 400, height: 400});
