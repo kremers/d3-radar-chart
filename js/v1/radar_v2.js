@@ -109,8 +109,8 @@ RadarChart.prototype.drawAxis = function() {
 
   //add the corresponding lines for each unique axis
   axis.append("line")
-      .attr("x1", this.config.width / 2.0)
-      .attr("y1", this.config.height / 2.0)
+      .attr("x1", radar.config.width / 2.0)
+      .attr("y1", radar.config.height / 2.0)
       .attr("x2", function(axis, index){
         radar.maxAxisValues[index] = {
           x: radar.config.width / 2.0 * (1 - radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
@@ -121,6 +121,11 @@ RadarChart.prototype.drawAxis = function() {
       .attr("y2", function(axis, index){
         radar.maxAxisValues[index].y = radar.config.height / 2.0 * (1 - radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
         return radar.maxAxisValues[index].y;
+      })
+      .attr("slope", function(axis, index){
+        var dy = radar.maxAxisValues[index].y - (radar.config.height / 2.0);
+        var dx = radar.maxAxisValues[index].x - (radar.config.width / 2.0);
+        return dy/dx;
       })
       .attr("class", "line")
       .style("stroke", "#7f8c8d")
@@ -229,6 +234,7 @@ RadarChart.prototype.move = function(axis, index) {
 
   this.parentNode.appendChild(this);
   var target = d3.select(this);
+  var target_axis = d3.selectAll('.axis')[0][index];
   var oldData = target.data()[0];
 
   var oldX = parseFloat(target.attr("cx"));
