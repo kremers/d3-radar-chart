@@ -147,8 +147,8 @@ $(document).ready(function(){
 
   var config = {
     radius: 5,
-    width: 400,
-    height: 400,
+    width: 500,
+    height: 500,
     maxValue: 20
   };
 
