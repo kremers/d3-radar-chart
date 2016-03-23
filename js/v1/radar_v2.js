@@ -69,7 +69,6 @@ RadarChart.prototype.updateScale = function() {
   });
 
   this.config.maxValue = Math.max(this.config.maxValue, d3.max(max_array));
-  console.log(this.config.maxValue);
 };
 
 // binds the arrays and the number of total axes
@@ -122,12 +121,18 @@ RadarChart.prototype.drawAxis = function() {
         radar.maxAxisValues[index].y = radar.config.height / 2.0 * (1 - radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
         return radar.maxAxisValues[index].y;
       })
-      .attr("slope", function(axis, index){
+      .attr("line_slope", function(axis, index){
+        console.log(radar.maxAxisValues);
+        console.log(radar.config.height / 2.0);
+        console.log(radar.config.width / 2.0);
         var dy = radar.maxAxisValues[index].y - (radar.config.height / 2.0);
         var dx = radar.maxAxisValues[index].x - (radar.config.width / 2.0);
+        console.log("index: " + index + " -> " + dy / dx);
         return dy/dx;
       })
-      .attr("class", "line")
+      .attr("class", function(axis, index){
+        return "line-"+index;
+      })
       .style("stroke", "#7f8c8d")
       .style("stroke-width", "2px");
 
@@ -234,6 +239,7 @@ RadarChart.prototype.move = function(axis, index) {
 
   this.parentNode.appendChild(this);
   var target = d3.select(this);
+  var slope = console.log(d3.select('.line-'+index).attr("line_slope"));
   var target_axis = d3.selectAll('.axis')[0][index];
   var oldData = target.data()[0];
 
