@@ -63,7 +63,6 @@ RadarChart.prototype.updateConfiguration = function(options) {
 //update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
   var max_array = [];
-  console.log(this.config.maxValue);
   _.each(this.data, function(datum){
     var result =_.max(datum.axes, function(axis){ return axis.value; });
     max_array.push(result.value);
@@ -125,7 +124,7 @@ RadarChart.prototype.drawAxis = function() {
       .attr("line_slope", function(axis, index){
         var dy = radar.maxAxisValues[index].y - (radar.config.height / 2.0);
         var dx = radar.maxAxisValues[index].x - (radar.config.width / 2.0);
-        console.log("index: " + index + " -> " + dy / dx);
+        //console.log("index: " + index + " -> " + dy / dx);
         return dy/dx;
       })
       .attr("class", function(axis, index){
@@ -222,11 +221,81 @@ RadarChart.prototype.renderNodes = function(data, index) {
        .attr("circle-class", data.className)
        .style("fill", radar.config.color(index))
        .style("fill-opacity", 0.9)
-       .call(d3.behavior.drag().on("drag", radar.move))
+       .call(d3.behavior.drag().on("drag", radar.moveAlt))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
        });
+};
+
+RadarChart.prototype.moveAlt = function (axis, index) {
+  var radar_chart =  getGlobalRadarObject();
+  this.parentNode.appendChild(this);
+  var target = d3.select(this);
+
+  //used to determine the step count when dx and dy change
+  var slope = d3.select('.line-'+index).attr("line_slope");
+  var oldData = target.data()[0];
+  var oldVal =  axis.value;
+  var step = axis.step;
+
+  //Coordinates
+  var oldX = parseFloat(target.attr("cx"));
+  var oldY = parseFloat(target.attr("cy"));
+  var newY = 0, newX = 0, newVal = 0;
+  var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
+
+  //algo
+  //if the slope is positive
+    //if the slope is approaching infinte
+      //only update the dy value
+    //else
+      //update target cx and cy by adding dx and dy
+    //increase value by one step
+  //if the slope is negative
+    //if the slope is approaching infinte
+      //only decrement the dy value
+    //else
+      //update target cx and cy by decrementing dx and dy
+
+  if(slope === "Infinity"){
+    newX = oldX;
+    newY = oldY + d3.event.dy;
+    if(d3.event.dy > 0)
+      newVal = oldVal + step;
+    else
+      newVal = oldVal - step;
+  }else if(slope === "-Infinity"){
+    newX = oldX;
+    newY = oldY - d3.event.dy;
+    if(d3.event.dy > 0)
+      newVal = oldVal + step;
+    else
+      newVal = oldVal - step;
+  }else{
+    newX = oldX + d3.event.dx;
+    if (Math.abs(newX) > Math.abs(maxX))
+      newX = maxX;
+    newY = newX * Math.abs(slope);
+    if(d3.event.dx > 0)
+      newVal = oldVal + step;
+    else
+      newVal = oldVal - step;
+  }
+
+  target.attr("cx", function(){ return newX; })
+        .attr("cy", function(){ return newY; });
+
+  var data_chart = _.find(radar_chart.data, function(chart){
+    return chart.className === target.attr("circle-class");
+  });
+
+  _.each(data_chart.axes, function(a){
+    if(a.axis === axis.axis)
+      a.value = newVal;
+  });
+  radar_chart.update();
+
 };
 
 RadarChart.prototype.move = function(axis, index) {
@@ -247,7 +316,8 @@ RadarChart.prototype.move = function(axis, index) {
   var newY = 0, newX = 0, newVal = 0;
   var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
 
-  console.log(d3.event);
+  console.log("d3: " + d3.event.dx + ":" + d3.event.dy);
+  console.log(axis);
 
   // Infinite slope special case
   if (slope === "Infinity" || slope === "-Infinity") {
@@ -258,6 +328,7 @@ RadarChart.prototype.move = function(axis, index) {
       newY = maxY;
     }
     newValue = (newY / oldY) * oldData.value;
+    console.log("bam value: " + newValue);
   } else {
     console.log("whammy");
     var temp = oldY / oldX;
@@ -266,16 +337,17 @@ RadarChart.prototype.move = function(axis, index) {
     if (Math.abs(newX) > Math.abs(maxX)){
       newX = maxX;
     }
-    newY = newX * slope;
+    newY = newX * Math.abs(slope);
 
     //Using the concept of similar triangles to calculate the new value of the geometric
     var ratio = newX / oldX;
-    newValue = ratio * oldData.value;
+    newValue = Math.abs(ratio) * oldData.value;
+    console.log("whammy-value: " + newValue);
     if(newValue > radar_chart.config.maxValue)
       newValue = radar_chart.config.maxValue;
   }
 
-  console.log(this);
+  //console.log(this);
 
   target.attr("cx", function(){ return newX; })
         .attr("cy", function(){ return newY; });
