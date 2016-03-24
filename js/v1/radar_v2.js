@@ -47,6 +47,7 @@ function RadarChart(id, data, options){
     color: d3.scale.category10(),
     normalize: false
   };
+  this.tooltip;
 }
 
 //based on the options passed in by the user,
@@ -122,9 +123,6 @@ RadarChart.prototype.drawAxis = function() {
         return radar.maxAxisValues[index].y;
       })
       .attr("line_slope", function(axis, index){
-        console.log(radar.maxAxisValues);
-        console.log(radar.config.height / 2.0);
-        console.log(radar.config.width / 2.0);
         var dy = radar.maxAxisValues[index].y - (radar.config.height / 2.0);
         var dx = radar.maxAxisValues[index].x - (radar.config.width / 2.0);
         console.log("index: " + index + " -> " + dy / dx);
@@ -239,7 +237,8 @@ RadarChart.prototype.move = function(axis, index) {
 
   this.parentNode.appendChild(this);
   var target = d3.select(this);
-  var slope = console.log(d3.select('.line-'+index).attr("line_slope"));
+  var slope = d3.select('.line-'+index).attr("line_slope");
+  console.log("slope: " + slope);
   var target_axis = d3.selectAll('.axis')[0][index];
   var oldData = target.data()[0];
 
@@ -248,16 +247,22 @@ RadarChart.prototype.move = function(axis, index) {
   var newY = 0, newX = 0, newVal = 0;
   var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
 
+  console.log(d3.event);
+
   // Infinite slope special case
-  if (oldX == 0) {
-    newY = oldY - d3.event.dy;
+  if (slope === "Infinity" || slope === "-Infinity") {
+    console.log("bam");
+    newY = oldY + d3.event.dy;
+    console.log(oldY + ":" + newY);
     if (Math.abs(newY) > Math.abs(maxY)){
       newY = maxY;
     }
     newValue = (newY / oldY) * oldData.value;
   } else {
-    var slope = oldY / oldX;
-    newX = d3.event.dx + parseFloat(target.attr("cx"));
+    console.log("whammy");
+    var temp = oldY / oldX;
+    newX = d3.event.dx + oldX;
+    console.log(oldX + "-" + newX);
     if (Math.abs(newX) > Math.abs(maxX)){
       newX = maxX;
     }
@@ -267,8 +272,10 @@ RadarChart.prototype.move = function(axis, index) {
     var ratio = newX / oldX;
     newValue = ratio * oldData.value;
     if(newValue > radar_chart.config.maxValue)
-      newValue =  radar_chart.config.maxValue;
+      newValue = radar_chart.config.maxValue;
   }
+
+  console.log(this);
 
   target.attr("cx", function(){ return newX; })
         .attr("cy", function(){ return newY; });
@@ -298,7 +305,7 @@ RadarChart.prototype.move = function(axis, index) {
   });*/
 
   //setGlobalRadarObject(radar_chart);
-  //radar_chart.update();
+  radar_chart.update();
 
 };
 
