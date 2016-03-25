@@ -259,6 +259,7 @@ RadarChart.prototype.moveAlt = function (axis, index) {
       //update target cx and cy by decrementing dx and dy
 
   if(slope === "Infinity"){
+    console.log("infinite");
     newX = oldX;
     newY = oldY + d3.event.dy;
     if(d3.event.dy > 0)
@@ -266,21 +267,32 @@ RadarChart.prototype.moveAlt = function (axis, index) {
     else
       newVal = oldVal - step;
   }else if(slope === "-Infinity"){
+    console.log("neg infinite");
     newX = oldX;
     newY = oldY - d3.event.dy;
     if(d3.event.dy > 0)
       newVal = oldVal + step;
     else
       newVal = oldVal - step;
+
+    console.log("OLD: " + oldX + ":" + oldY);
+    console.log("D: " + d3.event.dx + ":" + d3.event.dy);
+    console.log("NEW: " + newX + ":" + newY);
   }else{
     newX = oldX + d3.event.dx;
     if (Math.abs(newX) > Math.abs(maxX))
       newX = maxX;
-    newY = newX * Math.abs(slope);
+
+    var b =  -1 * ((slope * oldX) / oldY);
+    newY = (slope * newX) + b
     if(d3.event.dx > 0)
       newVal = oldVal + step;
     else
       newVal = oldVal - step;
+
+    console.log("OLD: " + oldX + ":" + oldY);
+    console.log("D: " + d3.event.dx + ":" + d3.event.dy);
+    console.log("NEW: " + newX + ":" + newY);
   }
 
   target.attr("cx", function(){ return newX; })
