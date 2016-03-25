@@ -262,36 +262,47 @@ RadarChart.prototype.moveAlt = function (axis, index) {
     console.log("infinite");
     newX = oldX;
     newY = oldY + d3.event.dy;
-    if (Math.abs(newY) >= Math.abs(maxY))
+    if (Math.abs(newY) >= Math.abs(maxY)){
       newY = maxY;
-    if(d3.event.dy > 0)
-      newVal = oldVal + step;
-    else
-      newVal = oldVal - step;
+      newVal = oldVal;
+    }else{
+      if(d3.event.dy > 0)
+        newVal = oldVal + step;
+      else
+        newVal = oldVal - step;
+    }
   }else if(slope === "-Infinity"){
     console.log("neg infinite");
     newX = oldX;
     newY = oldY - d3.event.dy;
-    if (Math.abs(newY) >= Math.abs(maxY))
+    if (Math.abs(newY) >= Math.abs(maxY)){
       newY = maxY;
-    if(d3.event.dy > 0)
-      newVal = oldVal + step;
-    else
-      newVal = oldVal - step;
+      newVal =  oldVal;
+    }else{
+      if(d3.event.dy > 0)
+        newVal = oldVal + step;
+      else
+        newVal = oldVal - step;
+    }
 
     console.log("OLD: " + oldX + ":" + oldY);
     console.log("D: " + d3.event.dx + ":" + d3.event.dy);
     console.log("NEW: " + newX + ":" + newY);
   }else{
     newX = oldX + d3.event.dx;
-    if (Math.abs(newX) > Math.abs(maxX))
+    if (Math.abs(newX) > Math.abs(maxX)){
+      console.log("what's good");
       newX = maxX;
-    var b =  -1 * ((slope * oldX) / oldY);
-    newY = (slope * newX) + b
-    if(d3.event.dx > 0)
-      newVal = oldVal + step;
-    else
-      newVal = oldVal - step;
+      newY = maxY;
+      newVal = oldVal;
+    }else{
+      var b =  -1 * ((slope * oldX) / oldY);
+      newY = (slope * newX) + b;
+      if(d3.event.dx > 0)
+        newVal = oldVal + step;
+      else
+        newVal = oldVal - step;
+    }
 
     console.log("OLD: " + oldX + ":" + oldY);
     console.log("D: " + d3.event.dx + ":" + d3.event.dy);
