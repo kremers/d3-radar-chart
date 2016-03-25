@@ -262,6 +262,8 @@ RadarChart.prototype.moveAlt = function (axis, index) {
     console.log("infinite");
     newX = oldX;
     newY = oldY + d3.event.dy;
+    if (Math.abs(newY) >= Math.abs(maxY))
+      newY = maxY;
     if(d3.event.dy > 0)
       newVal = oldVal + step;
     else
@@ -270,6 +272,8 @@ RadarChart.prototype.moveAlt = function (axis, index) {
     console.log("neg infinite");
     newX = oldX;
     newY = oldY - d3.event.dy;
+    if (Math.abs(newY) >= Math.abs(maxY))
+      newY = maxY;
     if(d3.event.dy > 0)
       newVal = oldVal + step;
     else
@@ -282,7 +286,6 @@ RadarChart.prototype.moveAlt = function (axis, index) {
     newX = oldX + d3.event.dx;
     if (Math.abs(newX) > Math.abs(maxX))
       newX = maxX;
-
     var b =  -1 * ((slope * oldX) / oldY);
     newY = (slope * newX) + b
     if(d3.event.dx > 0)
