@@ -1,5 +1,77 @@
 $(document).ready(function(){
   var data = [{
+    "className": "example_b",
+    "normalize": true,
+    "scale_max": 20,
+    "axes" : [
+      {
+        "axis" : "axis_one",
+        "value": 9,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 0
+      },
+      {
+        "axis" : "axis_two",
+        "value": 8,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 1
+      },
+      {
+        "axis" : "axis_three",
+        "value": 8,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 2
+      },
+      {
+        "axis" : "axis_four",
+        "value": 11,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 3
+      },
+      {
+        "axis" : "axis_five",
+        "value": 15,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 4
+      },
+      {
+        "axis" : "axis_six",
+        "value": 10,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 5
+      }
+    ]
+  },{
     "className": "example_a",
     "normalize": true,
     "scale_max": 20,
@@ -12,7 +84,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 0
       },
       {
         "axis" : "axis_two",
@@ -22,7 +95,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 1
       },
       {
         "axis" : "axis_three",
@@ -32,7 +106,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 2
       },
       {
         "axis" : "axis_four",
@@ -42,7 +117,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 3
       },
       {
         "axis" : "axis_five",
@@ -52,7 +128,8 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 4
       },
       {
         "axis" : "axis_six",
@@ -62,89 +139,24 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true
-      }
-    ]
-  },{
-    "className": "example_b",
-    "normalize": true,
-    "scale_max": 20,
-    "axes" : [
-      {
-        "axis" : "axis_one",
-        "value": 7,
-        "abs_min" : 0,
-        "min" : 0,
-        "abs_max" : 10,
-        "max" : 10,
-        "step": 1,
-        "drag": true
-      },
-      {
-        "axis" : "axis_two",
-        "value": 5,
-        "abs_min" : 0,
-        "min" : 0,
-        "abs_max" : 10,
-        "max" : 10,
-        "step": 1,
-        "drag": true
-      },
-      {
-        "axis" : "axis_three",
-        "value": 6,
-        "abs_min" : 0,
-        "min" : 0,
-        "abs_max" : 10,
-        "max" : 10,
-        "step": 1,
-        "drag": true
-      },
-      {
-        "axis" : "axis_four",
-        "value": 3,
-        "abs_min" : 0,
-        "min" : 0,
-        "abs_max" : 10,
-        "max" : 10,
-        "step": 1,
-        "drag": true
-      },
-      {
-        "axis" : "axis_five",
-        "value": 11,
-        "abs_min" : 0,
-        "min" : 0,
-        "abs_max" : 10,
-        "max" : 10,
-        "step": 1,
-        "drag": true
-      },
-      {
-        "axis" : "axis_six",
-        "value": 8,
-        "abs_min" : 0,
-        "min" : 0,
-        "abs_max" : 10,
-        "max" : 10,
-        "step": 1,
-        "drag": true
+        "drag": true,
+        "order": 5
       }
     ]
   }];
 
   var config = {
-    radius: 5, 
-    width: 400, 
-    height: 400,
+    radius: 5,
+    width: 500,
+    height: 500,
     maxValue: 20
   };
 
-  var radar = new RadarChart("#chart", data);
+  var radar = new RadarChart("#chart", data, config);
   radar.draw();
 
   /*var temp = new RadarChart('#temp', data, {radius: 5, width: 400, height: 400});
   temp.draw();
   console.log(temp.config);*/
-  
+
 });

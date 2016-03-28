@@ -41,15 +41,16 @@ function RadarChart(id, data, options){
     factor: 1, // Scaling Box
     factorLegend: 0.85,
     levels: 3, // Layers Box
-    maxValue: 0,
+    maxValue: 1,
     radians: 2 * Math.PI,
     opacityArea: 0.5,
     color: d3.scale.category10(),
     normalize: false
   };
+  this.tooltip;
 }
 
-//based on the options passed in by the user, 
+//based on the options passed in by the user,
 //update the configuration
 RadarChart.prototype.updateConfiguration = function(options) {
   if(options)
@@ -58,20 +59,19 @@ RadarChart.prototype.updateConfiguration = function(options) {
     }
 };
 
-//based on the data passed in 
+//based on the data passed in
 //update the scale the radar chart will use
 RadarChart.prototype.updateScale = function() {
   var max_array = [];
-
   _.each(this.data, function(datum){
     var result =_.max(datum.axes, function(axis){ return axis.value; });
     max_array.push(result.value);
   });
 
-  this.config.maxValue = 20;
+  this.config.maxValue = Math.max(this.config.maxValue, d3.max(max_array));
 };
 
-// binds the arrays and the number of total axes 
+// binds the arrays and the number of total axes
 //to the Radar chart object
 RadarChart.prototype.addAxisNames = function() {
   var names = [];
@@ -108,8 +108,8 @@ RadarChart.prototype.drawAxis = function() {
 
   //add the corresponding lines for each unique axis
   axis.append("line")
-      .attr("x1", this.config.width / 2.0)
-      .attr("y1", this.config.height / 2.0)
+      .attr("x1", radar.config.width / 2.0)
+      .attr("y1", radar.config.height / 2.0)
       .attr("x2", function(axis, index){
         radar.maxAxisValues[index] = {
           x: radar.config.width / 2.0 * (1 - radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
@@ -121,9 +121,17 @@ RadarChart.prototype.drawAxis = function() {
         radar.maxAxisValues[index].y = radar.config.height / 2.0 * (1 - radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
         return radar.maxAxisValues[index].y;
       })
-      .attr("class", "line")
+      .attr("line_slope", function(axis, index){
+        var dy = radar.maxAxisValues[index].y - (radar.config.height / 2.0);
+        var dx = radar.maxAxisValues[index].x - (radar.config.width / 2.0);
+        //console.log("index: " + index + " -> " + dy / dx);
+        return dy/dx;
+      })
+      .attr("class", function(axis, index){
+        return "line-"+index;
+      })
       .style("stroke", "#7f8c8d")
-      .style("stroke-width", "1px");
+      .style("stroke-width", "2px");
 
   //this will be used for the tooltips so that lables
   //and legends can be added to the chart for better viewing
@@ -144,7 +152,7 @@ RadarChart.prototype.drawAxis = function() {
 //for a given radar chart, this calculates the data points required
 //returns a double array of the x & y coordinates
 RadarChart.prototype.calculatePoints = function(data) {
-  
+
   var dataValues = [];
   var radar = this;
   radar.graph.selectAll(".nodes")
@@ -157,10 +165,34 @@ RadarChart.prototype.calculatePoints = function(data) {
   return dataValues;
 };
 
+RadarChart.prototype.baseStepScale = function () {
+  var baseScale = [];
+  var radar = this;
+  _.each(radar.data[0].axes, function(axis, index){
+    var array = [];
+    _.each(_.range(radar.config.maxValue + 1), function(value){
+      var object = {
+        index: index,
+        value: value,
+        x: radar.config.width / 2 * (1 - (parseFloat(Math.max(value, 0)) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
+        y: radar.config.height / 2 * (1 - (parseFloat(Math.max(value, 0)) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength))
+      };
+      array.push(object);
+    });
+    var item = {
+      name: axis.axis,
+      points: array
+    };
+    baseScale.push(item);
+  });
+  console.log(baseScale);
+  radar.baseScale = baseScale;
+};
+
 //for a data points object (bounded by the datapoints class name)
 //create a new polygon object
 //returns the generated polygon
-RadarChart.prototype.generatePolygon = function(dataPoints) {
+RadarChart.prototype.generatePolygon = function(dataPoints, index) {
   var radar = this;
   var polygon = radar.graph.selectAll("area")
                      .data([dataPoints.data])
@@ -168,7 +200,7 @@ RadarChart.prototype.generatePolygon = function(dataPoints) {
                      .append("polygon")
                      .attr("class", getPolygonClassName(dataPoints.className))
                      .style("stroke-width", "2px")
-                     .style("stroke", radar.config.color(0))
+                     .style("stroke", radar.config.color(index))
                      .on("mouseover", function(object){
                         element = "polygon." + d3.select(this).attr("class");
                         radar.graph.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
@@ -177,7 +209,7 @@ RadarChart.prototype.generatePolygon = function(dataPoints) {
                      .on("mouseout", function(){
                       radar.graph.selectAll("polygon").transition(200).style("fill-opacity", radar.config.opacityArea);
                      })
-                     .style("fill", function(data, index){ return radar.config.color(0); })
+                     .style("fill", function(data, i){ return radar.config.color(index); })
                      .style("fill-opacity", radar.config.opacityArea);
   return polygon;
 };
@@ -194,7 +226,7 @@ RadarChart.prototype.renderPolygon = function(polygon) {
   });
 };
 
-RadarChart.prototype.renderNodes = function(data) {
+RadarChart.prototype.renderNodes = function(data, index) {
   // body...
   var radar = this;
   radar.graph.selectAll(".nodes")
@@ -211,13 +243,164 @@ RadarChart.prototype.renderNodes = function(data) {
        })
        .attr("data-id", function(axis){ return axis.axis; })
        .attr("circle-class", data.className)
-       .style("fill", radar.config.color(0))
+       .style("fill", radar.config.color(index))
        .style("fill-opacity", 0.9)
-       .call(d3.behavior.drag().on("drag", radar.move))
+       .call(d3.behavior.drag().on("drag", radar.moveStep))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
        });
+};
+
+//using dx and dx, return a precomputed step x and y
+RadarChart.prototype.moveStep = function (axis, index) {
+
+  //algorithm
+  //retrieve current axis, value, and index
+  //retrieve dx and dy
+  //if there is a positive change for dx and dy
+    //incremenet the value and return the computed x & y
+  //if there is a decrease change for dx and dy
+    //decrement the value and return the computed x & y
+  //update the value associated with the radar chart
+  //run and variant of dataValues? returning the precomupted points
+  //update the polygon x&y position
+
+  //one problem is negative axis values, which need to be flipped
+  //when encoutering positive and negative values
+
+  var radar_chart =  getGlobalRadarObject();
+  this.parentNode.appendChild(this);
+  var target = d3.select(this);
+
+  if(d3.event.dx > 0){
+    console.log("DX positive");
+    var newVal = axis.value + axis.step;
+    console.log("New Value: " + newVal);
+  }else{
+    console.log("DX positive");
+    var newVal = axis.value - axis.step;
+    console.log("New Value: " + newVal);
+  }
+
+  var base_axis =  _.find(radar_chart.baseScale, function(item){
+    return item.name === axis.axis;
+  });
+
+  console.log(base_axis);
+  var point =  base_axis.points[newVal];
+  console.log(point);
+
+  target.attr("cx", function(){ return point.x; })
+        .attr("cy", function(){ return point.y; });
+
+  var data_chart = _.find(radar_chart.data, function(chart){
+    return chart.className === target.attr("circle-class");
+  });
+
+  _.each(data_chart.axes, function(a){
+    if(a.axis === axis.axis)
+      a.value = newVal;
+  });
+  radar_chart.update();
+
+};
+
+RadarChart.prototype.moveAlt = function (axis, index) {
+  var radar_chart =  getGlobalRadarObject();
+  this.parentNode.appendChild(this);
+  var target = d3.select(this);
+
+  //used to determine the step count when dx and dy change
+  var slope = d3.select('.line-'+index).attr("line_slope");
+  var oldData = target.data()[0];
+  var oldVal =  axis.value;
+  var step = axis.step;
+
+
+  //Coordinates
+  var oldX = parseFloat(target.attr("cx"));
+  var oldY = parseFloat(target.attr("cy"));
+  var newY = 0, newX = 0, newVal = 0;
+  var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
+
+  //algo
+  //if the slope is positive
+    //if the slope is approaching infinte
+      //only update the dy value
+    //else
+      //update target cx and cy by adding dx and dy
+    //increase value by one step
+  //if the slope is negative
+    //if the slope is approaching infinte
+      //only decrement the dy value
+    //else
+      //update target cx and cy by decrementing dx and dy
+
+  if(slope === "Infinity"){
+    //console.log("infinite");
+    newX = oldX;
+    newY = oldY + d3.event.dy;
+    if (Math.abs(newY) >= Math.abs(maxY)){
+      newY = maxY;
+      newVal = oldVal;
+    }else{
+      if(d3.event.dy > 0)
+        newVal = oldVal + step;
+      else
+        newVal = oldVal - step;
+    }
+  }else if(slope === "-Infinity"){
+    //console.log("neg infinite");
+    newX = oldX;
+    newY = oldY - d3.event.dy;
+    if (Math.abs(newY) >= Math.abs(maxY)){
+      newY = maxY;
+      newVal =  oldVal;
+    }else{
+      if(d3.event.dy > 0)
+        newVal = oldVal + step;
+      else
+        newVal = oldVal - step;
+    }
+
+    //console.log("OLD: " + oldX + ":" + oldY);
+    //console.log("D: " + d3.event.dx + ":" + d3.event.dy);
+    //console.log("NEW: " + newX + ":" + newY);
+  }else{
+    newX = oldX + d3.event.dx;
+    if (Math.abs(newX) > Math.abs(maxX)){
+      //console.log("what's good");
+      newX = maxX;
+      newY = maxY;
+      newVal = oldVal;
+    }else{
+      var b =  -1 * ((slope * oldX) / oldY);
+      newY = (slope * newX) + b;
+      if(d3.event.dx > 0)
+        newVal = oldVal + step;
+      else
+        newVal = oldVal - step;
+    }
+
+    //console.log("OLD: " + oldX + ":" + oldY);
+    //console.log("D: " + d3.event.dx + ":" + d3.event.dy);
+    //console.log("NEW: " + newX + ":" + newY);
+  }
+
+  target.attr("cx", function(){ return newX; })
+        .attr("cy", function(){ return newY; });
+
+  var data_chart = _.find(radar_chart.data, function(chart){
+    return chart.className === target.attr("circle-class");
+  });
+
+  _.each(data_chart.axes, function(a){
+    if(a.axis === axis.axis)
+      a.value = newVal;
+  });
+  radar_chart.update();
+
 };
 
 RadarChart.prototype.move = function(axis, index) {
@@ -228,59 +411,77 @@ RadarChart.prototype.move = function(axis, index) {
 
   this.parentNode.appendChild(this);
   var target = d3.select(this);
+  var slope = d3.select('.line-'+index).attr("line_slope");
+  console.log("slope: " + slope);
+  var target_axis = d3.selectAll('.axis')[0][index];
   var oldData = target.data()[0];
 
-  //console.log(radar_chart);
-  //console.log(axis);
-
-  var oldX = parseFloat(target.attr("cx")) - 300;
-  var oldY = 300 - parseFloat(target.attr("cy"));
+  var oldX = parseFloat(target.attr("cx"));
+  var oldY = parseFloat(target.attr("cy"));
   var newY = 0, newX = 0, newVal = 0;
+  var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
+
+  console.log("d3: " + d3.event.dx + ":" + d3.event.dy);
+  console.log(axis);
 
   // Infinite slope special case
-  if (oldX == 0) {
-    newY = oldY - d3.event.dy;
+  if (slope === "Infinity" || slope === "-Infinity") {
+    console.log("bam");
+    newY = oldY + d3.event.dy;
+    console.log(oldY + ":" + newY);
+    if (Math.abs(newY) > Math.abs(maxY)){
+      newY = maxY;
+    }
     newValue = (newY / oldY) * oldData.value;
+    console.log("bam value: " + newValue);
   } else {
-    var slope = oldY / oldX;
-    newX = d3.event.dx + parseFloat(target.attr("cx")) - 300;
-    newY = newX * slope;
+    console.log("whammy");
+    var temp = oldY / oldX;
+    newX = d3.event.dx + oldX;
+    console.log(oldX + "-" + newX);
+    if (Math.abs(newX) > Math.abs(maxX)){
+      newX = maxX;
+    }
+    newY = newX * Math.abs(slope);
 
     //Using the concept of similar triangles to calculate the new value of the geometric
     var ratio = newX / oldX;
-    newValue = ratio * oldData.value;
+    newValue = Math.abs(ratio) * oldData.value;
+    console.log("whammy-value: " + newValue);
+    if(newValue > radar_chart.config.maxValue)
+      newValue = radar_chart.config.maxValue;
   }
 
-  target.attr("cx", function(){ return newX + 300; })
-        .attr("cy", function(){ return 300 - newY; });
+  //console.log(this);
 
-
+  target.attr("cx", function(){ return newX; })
+        .attr("cy", function(){ return newY; });
 
   //here we go
   //"this" is bound to the circle dom element so that
   //we can compute the dx and dy
   //using the global accessor, we can change the associated value
-  //for a particular 
+  //for a particular
   var data_chart = _.find(radar_chart.data, function(chart){
     return chart.className === target.attr("circle-class");
   });
 
   _.each(data_chart.axes, function(a){
     if(a.axis === axis.axis){
-      console.log(radar_chart.data[0].axes[4].value);
+      //console.log(radar_chart.data[0].axes[4].value);
       a.value = newValue;
-      console.log(radar_chart.data[0].axes[4].value);
-      console.log("done");
+      //console.log(radar_chart.data[0].axes[4].value);
+      //console.log("done");
     }
-      
+
   });
 
-  _.each(radar_chart.data, function(chart){
+  /*_.each(radar_chart.data, function(chart){
     if(chart.className === data_chart.className)
       data_chart = chart;
-  });
+  });*/
 
-  setGlobalRadarObject(radar_chart);
+  //setGlobalRadarObject(radar_chart);
   radar_chart.update();
 
 };
@@ -288,10 +489,6 @@ RadarChart.prototype.move = function(axis, index) {
 RadarChart.prototype.update = function() {
   var radar_chart = this;
   //get rid of any remaining svgs
-
-  //radar_chart.updateScale();
-  //radar_chart.addAxisNames();
-  //radar_chart.computeRadius();
   d3.select(radar_chart.id).select("svg").remove();
 
   //create the graph
@@ -299,11 +496,10 @@ RadarChart.prototype.update = function() {
                         .append("svg")
                         .attr("width", radar_chart.config.width)
                         .attr("height", radar_chart.config.height)
-                        .append("g"); 
+                        .append("g");
 
   radar_chart.drawAxis();
-
-  _.each(radar_chart.data, function(radar){
+  _.each(radar_chart.data, function(radar, index){
       //generate data points
       var dataPoints = {
         className: radar.className,
@@ -311,9 +507,9 @@ RadarChart.prototype.update = function() {
       };
 
       //render polygon
-      var poly = radar_chart.generatePolygon(dataPoints);
+      var poly = radar_chart.generatePolygon(dataPoints, index);
       radar_chart.renderPolygon(poly);
-      radar_chart.renderNodes(radar);
+      radar_chart.renderNodes(radar, index);
    });
 };
 
@@ -330,6 +526,7 @@ RadarChart.prototype.draw = function() {
   radar_chart.updateScale();
   radar_chart.addAxisNames();
   radar_chart.computeRadius();
+  radar_chart.baseStepScale();
 
   //get rid of any remaining svgs
   d3.select(radar_chart.id).select("svg").remove();
@@ -345,17 +542,16 @@ RadarChart.prototype.draw = function() {
   //radar_chart.drawFrame();
   radar_chart.drawAxis();
 
-   _.each(radar_chart.data, function(radar){
-      //generate data points
+   _.each(radar_chart.data, function(radar, index){
       var dataPoints = {
         className: radar.className,
         data : radar_chart.calculatePoints(radar.axes)
       };
 
       //render polygon
-      var poly = radar_chart.generatePolygon(dataPoints);
+      var poly = radar_chart.generatePolygon(dataPoints, index);
       radar_chart.renderPolygon(poly);
-      radar_chart.renderNodes(radar);
+      radar_chart.renderNodes(radar, index);
    });
 
 };

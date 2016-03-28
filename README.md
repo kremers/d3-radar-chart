@@ -15,5 +15,4 @@ D3 Powered Draggable Radar Chart with Min-Max Ranges per Axis
 
 ####Contact Us
 [@tenji240](https://twitter.com/tenji240)
-
 [@mustwin](https://twitter.com/mustwin)
