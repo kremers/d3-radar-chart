@@ -185,7 +185,8 @@ RadarChart.prototype.baseStepScale = function () {
     };
     baseScale.push(item);
   });
-  return baseScale;
+  console.log(baseScale);
+  radar.baseScale = baseScale;
 };
 
 //for a data points object (bounded by the datapoints class name)
@@ -244,11 +245,65 @@ RadarChart.prototype.renderNodes = function(data, index) {
        .attr("circle-class", data.className)
        .style("fill", radar.config.color(index))
        .style("fill-opacity", 0.9)
-       .call(d3.behavior.drag().on("drag", radar.moveAlt))
+       .call(d3.behavior.drag().on("drag", radar.moveStep))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
        });
+};
+
+//using dx and dx, return a precomputed step x and y
+RadarChart.prototype.moveStep = function (axis, index) {
+
+  //algorithm
+  //retrieve current axis, value, and index
+  //retrieve dx and dy
+  //if there is a positive change for dx and dy
+    //incremenet the value and return the computed x & y
+  //if there is a decrease change for dx and dy
+    //decrement the value and return the computed x & y
+  //update the value associated with the radar chart
+  //run and variant of dataValues? returning the precomupted points
+  //update the polygon x&y position
+
+  //one problem is negative axis values, which need to be flipped
+  //when encoutering positive and negative values
+
+  var radar_chart =  getGlobalRadarObject();
+  this.parentNode.appendChild(this);
+  var target = d3.select(this);
+
+  if(d3.event.dx > 0){
+    console.log("DX positive");
+    var newVal = axis.value + axis.step;
+    console.log("New Value: " + newVal);
+  }else{
+    console.log("DX positive");
+    var newVal = axis.value - axis.step;
+    console.log("New Value: " + newVal);
+  }
+
+  var base_axis =  _.find(radar_chart.baseScale, function(item){
+    return item.name === axis.axis;
+  });
+
+  console.log(base_axis);
+  var point =  base_axis.points[newVal];
+  console.log(point);
+
+  target.attr("cx", function(){ return point.x; })
+        .attr("cy", function(){ return point.y; });
+
+  var data_chart = _.find(radar_chart.data, function(chart){
+    return chart.className === target.attr("circle-class");
+  });
+
+  _.each(data_chart.axes, function(a){
+    if(a.axis === axis.axis)
+      a.value = newVal;
+  });
+  radar_chart.update();
+
 };
 
 RadarChart.prototype.moveAlt = function (axis, index) {
@@ -261,6 +316,7 @@ RadarChart.prototype.moveAlt = function (axis, index) {
   var oldData = target.data()[0];
   var oldVal =  axis.value;
   var step = axis.step;
+
 
   //Coordinates
   var oldX = parseFloat(target.attr("cx"));
@@ -282,7 +338,7 @@ RadarChart.prototype.moveAlt = function (axis, index) {
       //update target cx and cy by decrementing dx and dy
 
   if(slope === "Infinity"){
-    console.log("infinite");
+    //console.log("infinite");
     newX = oldX;
     newY = oldY + d3.event.dy;
     if (Math.abs(newY) >= Math.abs(maxY)){
@@ -295,7 +351,7 @@ RadarChart.prototype.moveAlt = function (axis, index) {
         newVal = oldVal - step;
     }
   }else if(slope === "-Infinity"){
-    console.log("neg infinite");
+    //console.log("neg infinite");
     newX = oldX;
     newY = oldY - d3.event.dy;
     if (Math.abs(newY) >= Math.abs(maxY)){
@@ -308,13 +364,13 @@ RadarChart.prototype.moveAlt = function (axis, index) {
         newVal = oldVal - step;
     }
 
-    console.log("OLD: " + oldX + ":" + oldY);
-    console.log("D: " + d3.event.dx + ":" + d3.event.dy);
-    console.log("NEW: " + newX + ":" + newY);
+    //console.log("OLD: " + oldX + ":" + oldY);
+    //console.log("D: " + d3.event.dx + ":" + d3.event.dy);
+    //console.log("NEW: " + newX + ":" + newY);
   }else{
     newX = oldX + d3.event.dx;
     if (Math.abs(newX) > Math.abs(maxX)){
-      console.log("what's good");
+      //console.log("what's good");
       newX = maxX;
       newY = maxY;
       newVal = oldVal;
@@ -327,9 +383,9 @@ RadarChart.prototype.moveAlt = function (axis, index) {
         newVal = oldVal - step;
     }
 
-    console.log("OLD: " + oldX + ":" + oldY);
-    console.log("D: " + d3.event.dx + ":" + d3.event.dy);
-    console.log("NEW: " + newX + ":" + newY);
+    //console.log("OLD: " + oldX + ":" + oldY);
+    //console.log("D: " + d3.event.dx + ":" + d3.event.dy);
+    //console.log("NEW: " + newX + ":" + newY);
   }
 
   target.attr("cx", function(){ return newX; })
@@ -470,8 +526,7 @@ RadarChart.prototype.draw = function() {
   radar_chart.updateScale();
   radar_chart.addAxisNames();
   radar_chart.computeRadius();
-  var baseScale = radar_chart.baseStepScale();
-  console.log(baseScale);
+  radar_chart.baseStepScale();
 
   //get rid of any remaining svgs
   d3.select(radar_chart.id).select("svg").remove();
