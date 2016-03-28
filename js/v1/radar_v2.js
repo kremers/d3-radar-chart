@@ -165,6 +165,29 @@ RadarChart.prototype.calculatePoints = function(data) {
   return dataValues;
 };
 
+RadarChart.prototype.baseStepScale = function () {
+  var baseScale = [];
+  var radar = this;
+  _.each(radar.data[0].axes, function(axis, index){
+    var array = [];
+    _.each(_.range(radar.config.maxValue + 1), function(value){
+      var object = {
+        index: index,
+        value: value,
+        x: radar.config.width / 2 * (1 - (parseFloat(Math.max(value, 0)) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
+        y: radar.config.height / 2 * (1 - (parseFloat(Math.max(value, 0)) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength))
+      };
+      array.push(object);
+    });
+    var item = {
+      name: axis.axis,
+      points: array
+    };
+    baseScale.push(item);
+  });
+  return baseScale;
+};
+
 //for a data points object (bounded by the datapoints class name)
 //create a new polygon object
 //returns the generated polygon
@@ -447,6 +470,8 @@ RadarChart.prototype.draw = function() {
   radar_chart.updateScale();
   radar_chart.addAxisNames();
   radar_chart.computeRadius();
+  var baseScale = radar_chart.baseStepScale();
+  console.log(baseScale);
 
   //get rid of any remaining svgs
   d3.select(radar_chart.id).select("svg").remove();
