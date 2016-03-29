@@ -6,7 +6,12 @@
  * Random Helper Functions
  */
 
+//if m surpases this, default to dy only
+var POS_INFINTE = 100000000; //hundred million
+var NEG_INFINITE = (-1 * POS_INFINTE);
+
 var globalRadar; //not my greatest idea
+
 
 function getPolygonClassName(className){
   return className + "-radar";
@@ -185,7 +190,6 @@ RadarChart.prototype.baseStepScale = function () {
     };
     baseScale.push(item);
   });
-  console.log(baseScale);
   radar.baseScale = baseScale;
 };
 
@@ -272,27 +276,58 @@ RadarChart.prototype.moveStep = function (axis, index) {
   var radar_chart =  getGlobalRadarObject();
   this.parentNode.appendChild(this);
   var target = d3.select(this);
-
-  if(d3.event.dx > 0){
-    console.log("DX positive");
-    var newVal = axis.value + axis.step;
-    console.log("New Value: " + newVal);
-  }else{
-    console.log("DX positive");
-    var newVal = axis.value - axis.step;
-    console.log("New Value: " + newVal);
-  }
-
+  var slope = d3.select('.line-'+index).attr("line_slope");
   var base_axis =  _.find(radar_chart.baseScale, function(item){
     return item.name === axis.axis;
   });
 
-  console.log(base_axis);
-  var point =  base_axis.points[newVal];
-  console.log(point);
 
-  target.attr("cx", function(){ return point.x; })
-        .attr("cy", function(){ return point.y; });
+  //grab current x*y
+  var oldPoint = base_axis.points[axis.value];
+  //log difference
+  var difference = {
+    "x": d3.event.x - oldPoint.x,
+    "y": d3.event.y - oldPoint.y
+  };
+  console.log(difference);
+
+  //12.5 comes from the length of the axis / maxConfigValue
+
+  if(slope === "Infinity" || slope > POS_INFINTE){
+    if(difference.y >= 12.5){
+      var newVal = axis.value + axis.step;
+    }else if(difference.y <= -12.5){
+      var newVal = axis.value - axis.step;
+    }else{
+      var newVal = axis.value;
+    }
+  }else if(slope === "-Infinity" || slope < NEG_INFINITE){
+    if(difference.y >= 12.5){
+      var newVal = axis.value + axis.step;
+    }else if(difference.y <= -12.5){
+      var newVal = axis.value - axis.step;
+    }else{
+      var newVal = axis.value;
+    }
+  }else{
+    if(difference.x >= 12.5){
+      var newVal = axis.value + axis.step;
+    }else if(difference.x <= -12.5){
+      var newVal = axis.value - axis.step;
+    }else{
+      var newVal = axis.value;
+    }
+  }
+
+  if(newVal > radar_chart.config.maxValue)
+    newVal = radar_chart.config.maxValue;
+
+  var newPoint = base_axis.points[newVal];
+  if(newPoint){
+    target.attr("cx", function(){ return newPoint.x; })
+          .attr("cy", function(){ return newPoint.y; });
+  }
+
 
   var data_chart = _.find(radar_chart.data, function(chart){
     return chart.className === target.attr("circle-class");
@@ -363,10 +398,6 @@ RadarChart.prototype.moveAlt = function (axis, index) {
       else
         newVal = oldVal - step;
     }
-
-    //console.log("OLD: " + oldX + ":" + oldY);
-    //console.log("D: " + d3.event.dx + ":" + d3.event.dy);
-    //console.log("NEW: " + newX + ":" + newY);
   }else{
     newX = oldX + d3.event.dx;
     if (Math.abs(newX) > Math.abs(maxX)){
@@ -382,10 +413,6 @@ RadarChart.prototype.moveAlt = function (axis, index) {
       else
         newVal = oldVal - step;
     }
-
-    //console.log("OLD: " + oldX + ":" + oldY);
-    //console.log("D: " + d3.event.dx + ":" + d3.event.dy);
-    //console.log("NEW: " + newX + ":" + newY);
   }
 
   target.attr("cx", function(){ return newX; })
