@@ -294,17 +294,17 @@ RadarChart.prototype.moveStep = function (axis, index) {
   //12.5 comes from the length of the axis / maxConfigValue
 
   if(slope === "Infinity" || slope > POS_INFINTE){
-    if(difference.y >= 12.5){
+    if(difference.y >= 50 && d3.event.dy < 0){
       var newVal = axis.value + axis.step;
-    }else if(difference.y <= -12.5){
+    }else if(difference.y> -12.5 && d3.event.dy > 0){
       var newVal = axis.value - axis.step;
     }else{
       var newVal = axis.value;
     }
   }else if(slope === "-Infinity" || slope < NEG_INFINITE){
-    if(difference.y >= 12.5){
+    if(difference.y >= 12.5 && d3.event.dy < 0){
       var newVal = axis.value + axis.step;
-    }else if(difference.y <= -12.5){
+    }else if(difference.y >= 12.5 && d3.event.dy > 0){
       var newVal = axis.value - axis.step;
     }else{
       var newVal = axis.value;
@@ -321,6 +321,8 @@ RadarChart.prototype.moveStep = function (axis, index) {
 
   if(newVal > radar_chart.config.maxValue)
     newVal = radar_chart.config.maxValue;
+  if(newVal <= 0)
+    newVal =  0;
 
   var newPoint = base_axis.points[newVal];
   if(newPoint){
