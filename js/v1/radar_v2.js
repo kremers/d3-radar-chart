@@ -129,7 +129,6 @@ RadarChart.prototype.drawAxis = function() {
       .attr("line_slope", function(axis, index){
         var dy = radar.maxAxisValues[index].y - (radar.config.height / 2.0);
         var dx = radar.maxAxisValues[index].x - (radar.config.width / 2.0);
-        //console.log("index: " + index + " -> " + dy / dx);
         return dy/dx;
       })
       .attr("class", function(axis, index){
@@ -289,10 +288,8 @@ RadarChart.prototype.moveStep = function (axis, index) {
     "x": d3.event.x - oldPoint.x,
     "y": d3.event.y - oldPoint.y
   };
-  console.log(difference);
 
   //12.5 comes from the length of the axis / maxConfigValue
-
   if(slope === "Infinity" || slope > POS_INFINTE){
     if(difference.y >= 50 && d3.event.dy < 0){
       var newVal = axis.value + axis.step;
