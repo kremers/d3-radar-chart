@@ -276,6 +276,7 @@ RadarChart.prototype.moveStep = function (axis, index) {
   this.parentNode.appendChild(this);
   var target = d3.select(this);
   var slope = d3.select('.line-'+index).attr("line_slope");
+  var stepToPixel = 12.5;   //12.5 comes from the length of the axis / maxConfigValue
   var base_axis =  _.find(radar_chart.baseScale, function(item){
     return item.name === axis.axis;
   });
@@ -289,27 +290,26 @@ RadarChart.prototype.moveStep = function (axis, index) {
     "y": d3.event.y - oldPoint.y
   };
 
-  //12.5 comes from the length of the axis / maxConfigValue
   if(slope === "Infinity" || slope > POS_INFINTE){
     if(difference.y >= 50 && d3.event.dy < 0){
       var newVal = axis.value + axis.step;
-    }else if(difference.y> -12.5 && d3.event.dy > 0){
+    }else if(difference.y> -stepToPixel && d3.event.dy > 0){
       var newVal = axis.value - axis.step;
     }else{
       var newVal = axis.value;
     }
   }else if(slope === "-Infinity" || slope < NEG_INFINITE){
-    if(difference.y >= 12.5 && d3.event.dy < 0){
+    if(difference.y >= stepToPixel && d3.event.dy < 0){
       var newVal = axis.value + axis.step;
-    }else if(difference.y >= 12.5 && d3.event.dy > 0){
+    }else if(difference.y >= stepToPixel && d3.event.dy > 0){
       var newVal = axis.value - axis.step;
     }else{
       var newVal = axis.value;
     }
   }else{
-    if(difference.x >= 12.5){
+    if(difference.x >= stepToPixel){
       var newVal = axis.value + axis.step;
-    }else if(difference.x <= -12.5){
+    }else if(difference.x <= -stepToPixel){
       var newVal = axis.value - axis.step;
     }else{
       var newVal = axis.value;
