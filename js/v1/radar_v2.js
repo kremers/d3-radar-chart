@@ -292,8 +292,7 @@ RadarChart.prototype.moveStep = function (axis, index) {
   console.log(difference);
 
   //12.5 comes from the length of the axis / maxConfigValue
-
-  if(slope === "Infinity" || slope > POS_INFINTE){
+  /*if(slope === "Infinity" || slope > POS_INFINTE){
     if(difference.y >= 12.5){
       var newVal = axis.value + axis.step;
     }else if(difference.y <= -12.5){
@@ -317,10 +316,48 @@ RadarChart.prototype.moveStep = function (axis, index) {
     }else{
       var newVal = axis.value;
     }
+  }*/
+
+  if(slope === "Infinity" || slope > POS_INFINTE){
+    console.log("POS_INFINITE");
+    if(d3.event.dy > 0){
+       console.log("DY positive");
+       var newVal = axis.value + axis.step;
+       console.log("New Value: " + newVal);
+     }else{
+       console.log("DY negative");
+       var newVal = axis.value - axis.step;
+       console.log("New Value: " + newVal);
+     }
+  }else if(slope === "-Infinity" || slope < NEG_INFINITE){
+    console.log("NEG_INFINITE");
+    if(d3.event.dy > 0){
+       console.log("DY positive");
+       var newVal = axis.value + axis.step;
+       console.log("New Value: " + newVal);
+     }else{
+       console.log("DY negative");
+       var newVal = axis.value - axis.step;
+       console.log("New Value: " + newVal);
+     }
+  }else{
+    console.log("NORMAL: " + slope);
+    if(d3.event.dx > 0){
+       console.log("DX positive");
+       var newVal = axis.value + axis.step;
+       console.log("New Value: " + newVal);
+     }else{
+       console.log("DX negative");
+       var newVal = axis.value - axis.step;
+       console.log("New Value: " + newVal);
+     }
   }
+
 
   if(newVal > radar_chart.config.maxValue)
     newVal = radar_chart.config.maxValue;
+  if(newVal < 0)
+    newVal = 0;
 
   var newPoint = base_axis.points[newVal];
   if(newPoint){
