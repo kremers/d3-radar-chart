@@ -292,8 +292,8 @@ RadarChart.prototype.moveStep = function (axis, index) {
 
   //log changes
   console.log("old: " + oldPoint.x + ":" + oldPoint.y);
-  console.log("new: " + d3.event.x + ":" + d3.event.y);
-  console.log("diff: " + difference.x + ":" + difference.y);
+  //console.log("new: " + d3.event.x + ":" + d3.event.y);
+  //console.log("diff: " + difference.x + ":" + difference.y);
 
 
   /*if(slope === "Infinity" || slope > POS_INFINTE){
@@ -325,39 +325,50 @@ RadarChart.prototype.moveStep = function (axis, index) {
     }
   }*/
 
+
   if(slope === "Infinity" || slope > POS_INFINTE){
     console.log("POS_INFINITE");
-    if(d3.event.dy > 0){
-       console.log("DY positive");
-       var newVal = axis.value + axis.step;
-       console.log("New Value: " + newVal);
-     }else{
-       console.log("DY negative");
-       var newVal = axis.value - axis.step;
-       console.log("New Value: " + newVal);
-     }
+    if(oldPoint.y > 250){
+      if(d3.event.dy > 0){
+         var newVal = axis.value + axis.step;
+       }else{
+         var newVal = axis.value - axis.step;
+       }
+    }else{
+      if(d3.event.dy < 0){
+         var newVal = axis.value + axis.step;
+       }else{
+         var newVal = axis.value - axis.step;
+       }
+    }
   }else if(slope === "-Infinity" || slope < NEG_INFINITE){
-    console.log("NEG_INFINITE");
-    if(d3.event.dy > 0){
-       console.log("DY positive");
-       var newVal = axis.value + axis.step;
-       console.log("New Value: " + newVal);
-     }else{
-       console.log("DY negative");
-       var newVal = axis.value - axis.step;
-       console.log("New Value: " + newVal);
-     }
+    if(oldPoint.y > 250){
+      if(d3.event.dy > 0){
+         var newVal = axis.value + axis.step;
+       }else{
+         var newVal = axis.value - axis.step;
+       }
+    }else{
+      if(d3.event.dy < 0){
+         var newVal = axis.value + axis.step;
+       }else{
+         var newVal = axis.value - axis.step;
+       }
+    }
   }else{
-    console.log("NORMAL: " + slope);
-    if(d3.event.dx > 0){
-       console.log("DX positive");
-       var newVal = axis.value + axis.step;
-       console.log("New Value: " + newVal);
-     }else{
-       console.log("DX negative");
-       var newVal = axis.value - axis.step;
-       console.log("New Value: " + newVal);
-     }
+    if(oldPoint.x > 250){
+      if(d3.event.dx > 0){
+         var newVal = axis.value + axis.step;
+       }else{
+         var newVal = axis.value - axis.step;
+       }
+    }else{
+      if(d3.event.dx < 0){
+         var newVal = axis.value + axis.step;
+       }else{
+         var newVal = axis.value - axis.step;
+       }
+    }
   }
 
 
@@ -381,178 +392,6 @@ RadarChart.prototype.moveStep = function (axis, index) {
     if(a.axis === axis.axis)
       a.value = newVal;
   });
-  radar_chart.update();
-
-};
-
-RadarChart.prototype.moveAlt = function (axis, index) {
-  var radar_chart =  getGlobalRadarObject();
-  this.parentNode.appendChild(this);
-  var target = d3.select(this);
-
-  //used to determine the step count when dx and dy change
-  var slope = d3.select('.line-'+index).attr("line_slope");
-  var oldData = target.data()[0];
-  var oldVal =  axis.value;
-  var step = axis.step;
-
-
-  //Coordinates
-  var oldX = parseFloat(target.attr("cx"));
-  var oldY = parseFloat(target.attr("cy"));
-  var newY = 0, newX = 0, newVal = 0;
-  var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
-
-  //algo
-  //if the slope is positive
-    //if the slope is approaching infinte
-      //only update the dy value
-    //else
-      //update target cx and cy by adding dx and dy
-    //increase value by one step
-  //if the slope is negative
-    //if the slope is approaching infinte
-      //only decrement the dy value
-    //else
-      //update target cx and cy by decrementing dx and dy
-
-  if(slope === "Infinity"){
-    //console.log("infinite");
-    newX = oldX;
-    newY = oldY + d3.event.dy;
-    if (Math.abs(newY) >= Math.abs(maxY)){
-      newY = maxY;
-      newVal = oldVal;
-    }else{
-      if(d3.event.dy > 0)
-        newVal = oldVal + step;
-      else
-        newVal = oldVal - step;
-    }
-  }else if(slope === "-Infinity"){
-    //console.log("neg infinite");
-    newX = oldX;
-    newY = oldY - d3.event.dy;
-    if (Math.abs(newY) >= Math.abs(maxY)){
-      newY = maxY;
-      newVal =  oldVal;
-    }else{
-      if(d3.event.dy > 0)
-        newVal = oldVal + step;
-      else
-        newVal = oldVal - step;
-    }
-  }else{
-    newX = oldX + d3.event.dx;
-    if (Math.abs(newX) > Math.abs(maxX)){
-      //console.log("what's good");
-      newX = maxX;
-      newY = maxY;
-      newVal = oldVal;
-    }else{
-      var b =  -1 * ((slope * oldX) / oldY);
-      newY = (slope * newX) + b;
-      if(d3.event.dx > 0)
-        newVal = oldVal + step;
-      else
-        newVal = oldVal - step;
-    }
-  }
-
-  target.attr("cx", function(){ return newX; })
-        .attr("cy", function(){ return newY; });
-
-  var data_chart = _.find(radar_chart.data, function(chart){
-    return chart.className === target.attr("circle-class");
-  });
-
-  _.each(data_chart.axes, function(a){
-    if(a.axis === axis.axis)
-      a.value = newVal;
-  });
-  radar_chart.update();
-
-};
-
-RadarChart.prototype.move = function(axis, index) {
-  // body...
-
-  //call global accessor - that way we can access the data and update it accordingly
-  var radar_chart = getGlobalRadarObject();
-
-  this.parentNode.appendChild(this);
-  var target = d3.select(this);
-  var slope = d3.select('.line-'+index).attr("line_slope");
-  console.log("slope: " + slope);
-  var target_axis = d3.selectAll('.axis')[0][index];
-  var oldData = target.data()[0];
-
-  var oldX = parseFloat(target.attr("cx"));
-  var oldY = parseFloat(target.attr("cy"));
-  var newY = 0, newX = 0, newVal = 0;
-  var maxX = radar_chart.maxAxisValues[axis.order].x, maxY = radar_chart.maxAxisValues[axis.order].y;
-
-  console.log("d3: " + d3.event.dx + ":" + d3.event.dy);
-  console.log(axis);
-
-  // Infinite slope special case
-  if (slope === "Infinity" || slope === "-Infinity") {
-    console.log("bam");
-    newY = oldY + d3.event.dy;
-    console.log(oldY + ":" + newY);
-    if (Math.abs(newY) > Math.abs(maxY)){
-      newY = maxY;
-    }
-    newValue = (newY / oldY) * oldData.value;
-    console.log("bam value: " + newValue);
-  } else {
-    console.log("whammy");
-    var temp = oldY / oldX;
-    newX = d3.event.dx + oldX;
-    console.log(oldX + "-" + newX);
-    if (Math.abs(newX) > Math.abs(maxX)){
-      newX = maxX;
-    }
-    newY = newX * Math.abs(slope);
-
-    //Using the concept of similar triangles to calculate the new value of the geometric
-    var ratio = newX / oldX;
-    newValue = Math.abs(ratio) * oldData.value;
-    console.log("whammy-value: " + newValue);
-    if(newValue > radar_chart.config.maxValue)
-      newValue = radar_chart.config.maxValue;
-  }
-
-  //console.log(this);
-
-  target.attr("cx", function(){ return newX; })
-        .attr("cy", function(){ return newY; });
-
-  //here we go
-  //"this" is bound to the circle dom element so that
-  //we can compute the dx and dy
-  //using the global accessor, we can change the associated value
-  //for a particular
-  var data_chart = _.find(radar_chart.data, function(chart){
-    return chart.className === target.attr("circle-class");
-  });
-
-  _.each(data_chart.axes, function(a){
-    if(a.axis === axis.axis){
-      //console.log(radar_chart.data[0].axes[4].value);
-      a.value = newValue;
-      //console.log(radar_chart.data[0].axes[4].value);
-      //console.log("done");
-    }
-
-  });
-
-  /*_.each(radar_chart.data, function(chart){
-    if(chart.className === data_chart.className)
-      data_chart = chart;
-  });*/
-
-  //setGlobalRadarObject(radar_chart);
   radar_chart.update();
 
 };
