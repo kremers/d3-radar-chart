@@ -1,8 +1,82 @@
 $(document).ready(function(){
   var data = [{
-    "className": "example_b",
+    "className": "outer_loop",
     "normalize": true,
     "scale_max": 20,
+    "show_polygon": true,
+    "axes" : [
+      {
+        "axis" : "axis_one",
+        "value": 16,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": false,
+        "order": 0
+      },
+      {
+        "axis" : "axis_two",
+        "value": 16,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 1
+      },
+      {
+        "axis" : "axis_three",
+        "value": 16,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 2
+      },
+      {
+        "axis" : "axis_four",
+        "value": 16,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 3
+      },
+      {
+        "axis" : "axis_five",
+        "value": 16,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 4
+      },
+      {
+        "axis" : "axis_six",
+        "value": 16,
+        "abs_min" : 0,
+        "min" : 0,
+        "abs_max" : 10,
+        "max" : 10,
+        "step": 1,
+        "drag": true,
+        "order": 5
+      }
+    ]
+  },{
+    "className": "streaming",
+    "normalize": true,
+    "scale_max": 20,
+    "show_polygon": false,
     "axes" : [
       {
         "axis" : "axis_one",
@@ -12,7 +86,7 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true,
+        "drag": false,
         "order": 0
       },
       {
@@ -72,9 +146,10 @@ $(document).ready(function(){
       }
     ]
   },{
-    "className": "example_a",
+    "className": "inner_loop",
     "normalize": true,
     "scale_max": 20,
+    "show_polygon": true,
     "axes" : [
       {
         "axis" : "axis_one",

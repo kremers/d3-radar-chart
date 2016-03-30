@@ -272,6 +272,12 @@ RadarChart.prototype.moveStep = function (axis, index) {
   //one problem is negative axis values, which need to be flipped
   //when encoutering positive and negative values
 
+  if(axis.drag === false){
+    console.log("cannont drag");
+    return;
+  }
+
+
   var radar_chart =  getGlobalRadarObject();
   this.parentNode.appendChild(this);
   var target = d3.select(this);
@@ -418,7 +424,9 @@ RadarChart.prototype.update = function() {
 
       //render polygon
       var poly = radar_chart.generatePolygon(dataPoints, index);
-      radar_chart.renderPolygon(poly);
+      if(radar.show_polygon){
+        radar_chart.renderPolygon(poly);
+      }
       radar_chart.renderNodes(radar, index);
    });
 };
@@ -460,7 +468,9 @@ RadarChart.prototype.draw = function() {
 
       //render polygon
       var poly = radar_chart.generatePolygon(dataPoints, index);
-      radar_chart.renderPolygon(poly);
+      if(radar.show_polygon){
+        radar_chart.renderPolygon(poly);
+      }
       radar_chart.renderNodes(radar, index);
    });
 
