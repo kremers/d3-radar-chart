@@ -68,6 +68,7 @@ $(document).ready(function(){
 
 // Proposed API for this final product:
 
+/*
 var axis = new RadarChartAxis([
   {metric: "cpu", min: 0, max: 100},
   {metric: "ram", min: 0, max: 100},
@@ -75,12 +76,14 @@ var axis = new RadarChartAxis([
   {metric: "disk_io", min: 0, max: 10000},
 ]);
 var minMetrics = [{metric: "cpu", value: 10}, {metric: "ram", value: 10}, {metric: "network_id", value: 10}, {metric: "disk_id", value: 10}];
-var minOptions = { className: "min-radar", /* ... */ }
+var minOptions = { className: "min-radar", ... }
 var minRadarChart = new RadarChart(axis, minMetrics, minOptions);
 
-var maxOptions = { className: "max-radar", /* ... */ }
+var maxOptions = { className: "max-radar", minBoundingFn: function(metric) { return minRadarChart.getData()[metric]; }, ... }
 var maxMetrics = [{metric: "cpu", value: 80}, {metric: "ram", value: 80}, {metric: "network_id", value: 800}, {metric: "disk_id", value: 1000}]
 var maxRadarChart = new RadarChart(axis, maxMetrics, maxOptions);
+
+minRadarChart.setOptions({maxBoundingFn: function(metric) { return maxRadarChart.getData()[metric]; } })
 
 var liveMetrics = [{metric: "cpu", value: 60}, {metric: "ram", value: 60}, {metric: "network_id", value: 600}, {metric: "disk_id", value: 400}]
 var liveRadarChart = new RadarChart(axis, liveMetrics, {className: "live-radar", draggable: false});
@@ -96,7 +99,7 @@ var chartSert = new RadarChartSet({width: 500, height: 500})
     .addRadarChart(minRadarChart)
     .addRadarChart(maxRadarChart)
     .addRadarChart(liveRadarChart)
-
+*/
 
 
 
