@@ -97,7 +97,7 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true,
+        "drag": false,
         "order": 1
       },
       {
@@ -108,7 +108,7 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true,
+        "drag": false,
         "order": 2
       },
       {
@@ -119,18 +119,18 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true,
+        "drag": false,
         "order": 3
       },
       {
         "axis" : "axis_five",
-        "value": 15,
+        "value": 12,
         "abs_min" : 0,
         "min" : 0,
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true,
+        "drag": false,
         "order": 4
       },
       {
@@ -141,7 +141,7 @@ $(document).ready(function(){
         "abs_max" : 10,
         "max" : 10,
         "step": 1,
-        "drag": true,
+        "drag": false,
         "order": 5
       }
     ]

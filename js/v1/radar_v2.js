@@ -295,9 +295,10 @@ RadarChart.prototype.moveStep = function (axis, index) {
     "x": d3.event.x - oldPoint.x,
     "y": d3.event.y - oldPoint.y
   };
+  //console.log(difference);
 
   //log changes
-  console.log("old: " + oldPoint.x + ":" + oldPoint.y);
+  //console.log("old: " + oldPoint.x + ":" + oldPoint.y);
   //console.log("new: " + d3.event.x + ":" + d3.event.y);
   //console.log("diff: " + difference.x + ":" + difference.y);
 
@@ -334,6 +335,8 @@ RadarChart.prototype.moveStep = function (axis, index) {
 
   if(slope === "Infinity" || slope > POS_INFINTE){
     console.log("POS_INFINITE");
+    console.log(difference.y);
+
     if(oldPoint.y > 250){
       if(d3.event.dy > 0){
          var newVal = axis.value + axis.step;
@@ -348,6 +351,9 @@ RadarChart.prototype.moveStep = function (axis, index) {
        }
     }
   }else if(slope === "-Infinity" || slope < NEG_INFINITE){
+    console.log("NEG_INFINITE");
+    console.log(difference.y);
+
     if(oldPoint.y > 250){
       if(d3.event.dy > 0){
          var newVal = axis.value + axis.step;
@@ -362,6 +368,9 @@ RadarChart.prototype.moveStep = function (axis, index) {
        }
     }
   }else{
+    console.log("NORMAL");
+    console.log(difference.x);
+
     if(oldPoint.x > 250){
       if(d3.event.dx > 0){
          var newVal = axis.value + axis.step;
@@ -378,17 +387,16 @@ RadarChart.prototype.moveStep = function (axis, index) {
   }
 
 
-  if(newVal > radar_chart.config.maxValue)
+  if(newVal >= radar_chart.config.maxValue)
     newVal = radar_chart.config.maxValue;
   if(newVal <= 0)
     newVal =  0;
 
   var newPoint = base_axis.points[newVal];
   if(newPoint){
-    target.attr("cx", function(){ return newPoint.x; })
-          .attr("cy", function(){ return newPoint.y; });
+    target.attr("cy", axis.x = d3.event.x)
+          .attr("cy", axis.y = d3.event.y);
   }
-
 
   var data_chart = _.find(radar_chart.data, function(chart){
     return chart.className === target.attr("circle-class");
@@ -398,6 +406,7 @@ RadarChart.prototype.moveStep = function (axis, index) {
     if(a.axis === axis.axis)
       a.value = newVal;
   });
+  
   radar_chart.update();
 
 };
