@@ -25,6 +25,10 @@ a:active {
 .row {
   margin: 20px;
 }
+.line {
+  stroke: #000;
+  stroke-dasharray: 3,3;
+}
 blockquote {
   padding: 10px 20px;
   margin: 20px;
