@@ -36,7 +36,7 @@ function RadarChart(id, data, options){
   //Declarations
   this.id = id;
   this.data = data;
-  this.options = options;
+  //this.options = options; // Not used, this should overwrite the config
   this.maxAxisValues = [];
   this.minAxisValues = [];
   this.config = {
@@ -53,6 +53,7 @@ function RadarChart(id, data, options){
     normalize: false
   };
   this.tooltip;
+  this.updateConfiguration(options)
 }
 
 //based on the options passed in by the user,
@@ -87,7 +88,7 @@ RadarChart.prototype.addAxisNames = function() {
   this.axisNames = _.uniq(names, function(item){
     return item;
   });
-  this.totalAxisLength = this.axisNames.length;
+  this.numberOfAxes = this.axisNames.length;
 };
 
 //binds the radar radius to the RadarChart
@@ -98,6 +99,23 @@ RadarChart.prototype.computeRadius = function() {
 RadarChart.prototype.drawFrame = function() {
   //to be added later for visual purposes of course
 };
+
+RadarChart.prototype.xCoord = function(axisIndex, value) {
+  return this.config.width / 2.0 * (1 - (parseFloat(Math.max(value, 0)) / this.config.maxValue) * this.config.factor * Math.sin(axisIndex * this.config.radians / this.numberOfAxes));
+}
+
+RadarChart.prototype.yCoord = function(axisIndex, value) {
+  return this.config.height / 2 * (1 - (parseFloat(Math.max(value, 0)) / this.config.maxValue) * this.config.factor * Math.cos(axisIndex * this.config.radians / this.numberOfAxes));
+}
+
+RadarChart.prototype.xCoordToValue = function(axisIndex, xCoord) {
+  return this.config.maxValue * ( (1 - 2 * xCoord / this.config.width) / Math.sin(this.config.radians * axisIndex / this.numberOfAxes) / this.config.factor);
+}
+
+RadarChart.prototype.yCoordToValue = function(axisIndex, yCoord) {
+  return this.config.maxValue * ( (1 - 2 * yCoord / this.config.height) / Math.cos(this.config.radians * axisIndex / this.numberOfAxes) / this.config.factor);
+}
+
 
 //this is designed to draw all unique axes that are passed in
 //even if the two radar charts have two different sets of data
@@ -117,13 +135,13 @@ RadarChart.prototype.drawAxis = function() {
       .attr("y1", radar.config.height / 2.0)
       .attr("x2", function(axis, index){
         radar.maxAxisValues[index] = {
-          x: radar.config.width / 2.0 * (1 - radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
+          x: radar.xCoord(index, radar.config.maxValue),
           y: 0
         };
         return radar.maxAxisValues[index].x;
       })
       .attr("y2", function(axis, index){
-        radar.maxAxisValues[index].y = radar.config.height / 2.0 * (1 - radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
+        radar.maxAxisValues[index].y = radar.yCoord(index, radar.config.maxValue);
         return radar.maxAxisValues[index].y;
       })
       .attr("line_slope", function(axis, index){
@@ -145,10 +163,11 @@ RadarChart.prototype.drawAxis = function() {
       .style("font-size", "10px")
       .attr("transform", function (axis, index) { return "translate(0, -10)"; })
       .attr("x", function(axis, index){
-        return radar.config.width / 2.0 * (1 - radar.config.factorLegend * Math.sin(index * radar.config.radians / radar.totalAxisLength)) - 20 * Math.sin(index * radar.config.radians / radar.totalAxisLength);
+        // TODO: Not sure what these do
+        return radar.config.width / 2.0 * (1 - radar.config.factorLegend * Math.sin(index * radar.config.radians / radar.numberOfAxes)) - 20 * Math.sin(index * radar.config.radians / radar.numberOfAxes);
       })
       .attr("y", function(axis, index){
-        return radar.config.height / 2.0 * (1 - Math.cos(index * radar.config.radians / radar.totalAxisLength) + 20 * Math.cos(index * radar.config.radians / radar.totalAxisLength));
+        return radar.config.height / 2.0 * (1 - Math.cos(index * radar.config.radians / radar.numberOfAxes) + 20 * Math.cos(index * radar.config.radians / radar.numberOfAxes));
       });
 };
 
@@ -162,9 +181,9 @@ RadarChart.prototype.calculatePoints = function(data) {
   radar.graph.selectAll(".nodes")
       .data(data, function(axis, index){
         dataValues[index] = [
-          radar.config.width / 2 * (1 - (parseFloat(Math.max(axis.value, 0)) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
-          radar.config.height / 2 * (1 - (parseFloat(Math.max(axis.value, 0)) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength))
-        ]
+          radar.xCoord(index, axis.value),
+          radar.yCoord(index, axis.value)
+        ];
       });
   return dataValues;
 };
@@ -178,8 +197,8 @@ RadarChart.prototype.baseStepScale = function () {
       var object = {
         index: index,
         value: value,
-        x: radar.config.width / 2 * (1 - (parseFloat(Math.max(value, 0)) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength)),
-        y: radar.config.height / 2 * (1 - (parseFloat(Math.max(value, 0)) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength))
+        x: radar.xCoord(index, value),
+        y: radar.yCoord(index, value)
       };
       array.push(object);
     });
@@ -239,10 +258,10 @@ RadarChart.prototype.renderNodes = function(data, index) {
        .attr("r", radar.config.radius)
        .attr("alt", function(axis){ return Math.max(axis.value, 0); })
        .attr("cx", function(axis, index){
-          return radar.config.width / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.sin(index * radar.config.radians / radar.totalAxisLength));
+          return radar.xCoord(index, axis.value);
        })
        .attr("cy", function(axis, index){
-          return radar.config.height / 2.0 * (1 - (Math.max(axis.value, 0) / radar.config.maxValue) * radar.config.factor * Math.cos(index * radar.config.radians / radar.totalAxisLength));
+          return radar.yCoord(index, axis.value)
        })
        .attr("data-id", function(axis){ return axis.axis; })
        .attr("circle-class", data.className)
@@ -285,93 +304,21 @@ RadarChart.prototype.moveStep = function (axis, index) {
   //grab current x*y
   var oldPoint = base_axis.points[axis.value];
   //log difference
-  var difference = {
-    "x": d3.event.x - oldPoint.x,
-    "y": d3.event.y - oldPoint.y
-  };
-
-  //log changes
-  console.log("old: " + oldPoint.x + ":" + oldPoint.y);
-  //console.log("new: " + d3.event.x + ":" + d3.event.y);
-  //console.log("diff: " + difference.x + ":" + difference.y);
 
 
-  /*if(slope === "Infinity" || slope > POS_INFINTE){
-    console.log("infinite");
-    if(difference.y >= stepToPixel && d3.event.dy < 0){
-      var newVal = axis.value + axis.step;
-    }else if(difference.y> -stepToPixel && d3.event.dy > 0){
-      var newVal = axis.value - axis.step;
-    }else{
-      var newVal = axis.value;
-    }
-  }else if(slope === "-Infinity" || slope < NEG_INFINITE){
-    console.log("-infinite");
-    if(difference.y >= stepToPixel && d3.event.dy < 0){
-      var newVal = axis.value + axis.step;
-    }else if(difference.y >= stepToPixel && d3.event.dy > 0){
-      var newVal = axis.value - axis.step;
-    }else{
-      var newVal = axis.value;
-    }
-  }else{
-    console.log("dx.dy");
-    if(difference.x >= stepToPixel && d3.event.dx > 0){
-      var newVal = axis.value + axis.step;
-    }else if(difference.x <= -stepToPixel && d3.event.dx < 0){
-      var newVal = axis.value - axis.step;
-    }else{
-      var newVal = axis.value;
-    }
-  }*/
+  var segmentOrigin = {x: radar_chart.config.width / 2, y: radar_chart.config.width / 2}; // p0
+  var segmentEnd = {x: radar_chart.xCoord(index, radar_chart.config.maxValue), y: radar_chart.yCoord(index, radar_chart.config.maxValue)} // p1
 
-
-  if(slope === "Infinity" || slope > POS_INFINTE){
-    console.log("POS_INFINITE");
-    if(oldPoint.y > 250){
-      if(d3.event.dy > 0){
-         var newVal = axis.value + axis.step;
-       }else{
-         var newVal = axis.value - axis.step;
-       }
-    }else{
-      if(d3.event.dy < 0){
-         var newVal = axis.value + axis.step;
-       }else{
-         var newVal = axis.value - axis.step;
-       }
-    }
-  }else if(slope === "-Infinity" || slope < NEG_INFINITE){
-    if(oldPoint.y > 250){
-      if(d3.event.dy > 0){
-         var newVal = axis.value + axis.step;
-       }else{
-         var newVal = axis.value - axis.step;
-       }
-    }else{
-      if(d3.event.dy < 0){
-         var newVal = axis.value + axis.step;
-       }else{
-         var newVal = axis.value - axis.step;
-       }
-    }
-  }else{
-    if(oldPoint.x > 250){
-      if(d3.event.dx > 0){
-         var newVal = axis.value + axis.step;
-       }else{
-         var newVal = axis.value - axis.step;
-       }
-    }else{
-      if(d3.event.dx < 0){
-         var newVal = axis.value + axis.step;
-       }else{
-         var newVal = axis.value - axis.step;
-       }
-    }
-  }
-
-
+  // Stolen from: http://bl.ocks.org/mbostock/4281513
+  var x10 = segmentEnd.x - segmentOrigin.x,
+      y10 = segmentEnd.y - segmentOrigin.y,
+      x20 = d3.event.x - segmentOrigin.x,
+      y20 = d3.event.y - segmentOrigin.y,
+      pointLineSegmentParam = (x20 * x10 + y20 * y10) / (x10 * x10 + y10 * y10)
+      newXValue = segmentOrigin.x + pointLineSegmentParam * x10,
+      newYValue = segmentOrigin.y + pointLineSegmentParam * y10;
+console.log(pointLineSegmentParam)
+/*
   if(newVal > radar_chart.config.maxValue)
     newVal = radar_chart.config.maxValue;
   if(newVal <= 0)
@@ -379,9 +326,10 @@ RadarChart.prototype.moveStep = function (axis, index) {
 
   var newPoint = base_axis.points[newVal];
   if(newPoint){
-    target.attr("cx", function(){ return newPoint.x; })
-          .attr("cy", function(){ return newPoint.y; });
-  }
+    */
+    target.attr("cx", function(){ return newXValue; })
+          .attr("cy", function(){ return newYValue; });
+//  }
 
 
   var data_chart = _.find(radar_chart.data, function(chart){
@@ -389,8 +337,19 @@ RadarChart.prototype.moveStep = function (axis, index) {
   });
 
   _.each(data_chart.axes, function(a){
-    if(a.axis === axis.axis)
-      a.value = newVal;
+    if(a.axis === axis.axis) {
+      var valBasedOnX = radar_chart.xCoordToValue(index, newXValue),
+          valBasedOnY = radar_chart.yCoordToValue(index, newYValue);
+      // Check for crazy values and axes that overlap with our coordinate system's before accepting values
+      if (!isNaN(valBasedOnX) && isFinite(valBasedOnX) && (newXValue > radar_chart.config.width / 2 + 1 && newXValue < radar_chart.config.width / 2 - 1)) {
+        a.value = valBasedOnX;
+      } else if (!isNaN(valBasedOnY) && isFinite(valBasedOnY)) {
+        a.value = valBasedOnY;
+      } else {
+        console.log(" NEW VAL explodes: " + valBasedOnX + " - " + valBasedOnY);
+      }
+      console.log({x: newXValue, y: newYValue, xValue: valBasedOnX, yValue: valBasedOnY})
+    }
   });
   radar_chart.update();
 
@@ -432,7 +391,6 @@ RadarChart.prototype.draw = function() {
   setGlobalRadarObject(this);
 
   var radar_chart = this;
-  radar_chart.updateConfiguration(radar_chart.options);
   radar_chart.updateScale();
   radar_chart.addAxisNames();
   radar_chart.computeRadius();
