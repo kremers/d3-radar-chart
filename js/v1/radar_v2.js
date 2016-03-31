@@ -1,27 +1,6 @@
 //Radar Chart Tembot v1
 //pre-requisite: underscore.js
 
-
-/*
- * Random Helper Functions
- */
-
-//if m surpases this, default to dy only
-var POS_INFINTE = 100000000; //hundred million
-var NEG_INFINITE = (-1 * POS_INFINTE);
-
-var globalRadar; //not my greatest idea
-
-
-//getters and setters for the radar object
-function setGlobalRadarObject(radar){
-  globalRadar = radar;
-}
-
-function getGlobalRadarObject(){
-  return globalRadar;
-}
-
 /*
  * Prototypes and Public functions
  */
@@ -37,7 +16,7 @@ function RadarChart(id, data, options){
   this.minAxisValues = [];
   this.config = {
     className: "rename-me",
-    radius: 6, // Radius Point
+    radius: 8, // Radius Point
     width: 600,
     height: 600,
     factor: 1, // Scaling Box
@@ -47,7 +26,7 @@ function RadarChart(id, data, options){
     radians: 2 * Math.PI,
     opacityArea: 0.5,
     color: d3.scale.category10()[0],
-    normalize: false
+    //normalize: false // doesn't exist yet
   };
   this.tooltip;
   this.updateConfiguration(options)
@@ -242,8 +221,58 @@ RadarChart.prototype.renderPolygon = function(polygon) {
 };
 
 RadarChart.prototype.renderNodes = function(data) {
-  // body...
   var radar = this;
+
+  function moveStep(axis, index) {
+    var target = d3.select(this);
+
+    var segmentOrigin = {x: radar.config.width / 2, y: radar.config.width / 2}; // p0
+    var segmentEnd = {x: radar.xCoord(index, radar.config.maxValue), y: radar.yCoord(index, radar.config.maxValue)} // p1
+
+    // Stolen from: http://bl.ocks.org/mbostock/4281513
+    var x10 = segmentEnd.x - segmentOrigin.x,
+        y10 = segmentEnd.y - segmentOrigin.y,
+        x20 = d3.event.x - segmentOrigin.x,
+        y20 = d3.event.y - segmentOrigin.y,
+        pointLineSegmentParam = (x20 * x10 + y20 * y10) / (x10 * x10 + y10 * y10)
+        newXValue = segmentOrigin.x + pointLineSegmentParam * x10,
+        newYValue = segmentOrigin.y + pointLineSegmentParam * y10;
+
+    _.each(radar.data.axes, function(a){ // TODO: Assign the relevant axis as an attribute on the circle element
+      if(a.axis === axis.axis) {
+        var valBasedOnX = radar.xCoordToValue(index, newXValue),
+            valBasedOnY = radar.yCoordToValue(index, newYValue),
+            newValue; // Final value
+        // Check for crazy values and axes that overlap with our coordinate system's before accepting values
+        if (!isNaN(valBasedOnX) && isFinite(valBasedOnX) && (newXValue > radar.config.width / 2 + 1 && newXValue < radar.config.width / 2 - 1)) {
+          newValue = valBasedOnX;
+        } else if (!isNaN(valBasedOnY) && isFinite(valBasedOnY)) {
+          newValue = valBasedOnY;
+        } else {
+          console.log(" NEW VAL explodes: " + valBasedOnX + " - " + valBasedOnY);
+        }
+        console.log({d3x: d3.event.x, d3y: d3.event.y, d3dx: d3.event.dx, d3dy: d3.event.dy, x: newXValue, y: newYValue, xValue: valBasedOnX, yValue: valBasedOnY})
+
+        //newValue = Math.max(newValue, 0);
+        //newValue = Math.min(newValue, a.max);
+        if (!(newValue < 0 || newValue > a.max)) {
+          a.value = newValue;
+
+          target.attr("cx", function(){ return newXValue; })
+                .attr("cy", function(){ return newYValue; });
+        } else {
+          console.log("Won't extend axis beyond max value: " + a.max + ", have: " + newValue);
+        }
+      }
+    });
+    radar.update();
+
+    radar.projection = d3.select('svg').append("path")
+        .attr("class", "line");
+    d3.select('.line').attr("d", "M" + [d3.event.x, d3.event.y] + "L" + [newXValue, newYValue]);
+    console.log("end x: " + d3.event.x)
+  };
+
   radar.graph.selectAll(".nodes")
        .data(data.axes)
        .enter()
@@ -261,91 +290,11 @@ RadarChart.prototype.renderNodes = function(data) {
        .style("fill", radar.config.color)
        .style("fill-opacity", 0.9)
        .call(
-         d3.behavior.drag().on("drag", radar.moveStep))
+         d3.behavior.drag().on("drag", moveStep))
        .append("svg:title")
        .text(function (data) {
          return Math.max(data.value, 0);
        });
-};
-
-//using dx and dx, return a precomputed step x and y
-RadarChart.prototype.moveStep = function (axis, index) {
-
-  //algorithm
-  //retrieve current axis, value, and index
-  //retrieve dx and dy
-  //if there is a positive change for dx and dy
-    //incremenet the value and return the computed x & y
-  //if there is a decrease change for dx and dy
-    //decrement the value and return the computed x & y
-  //update the value associated with the radar chart
-  //run and variant of dataValues? returning the precomupted points
-  //update the polygon x&y position
-
-  //one problem is negative axis values, which need to be flipped
-  //when encoutering positive and negative values
-
-  var radar_chart =  getGlobalRadarObject();
-  //this.parentNode.appendChild(this);
-  var target = d3.select(this);
-  var slope = d3.select('.line-'+index).attr("line_slope");
-  var stepToPixel = 12.5;   //12.5 comes from the length of the axis / maxConfigValue
-  var base_axis =  _.find(radar_chart.baseScale, function(item){
-    return item.name === axis.axis;
-  });
-
-
-  //grab current x*y
-  var oldPoint = base_axis.points[axis.value];
-
-
-  var segmentOrigin = {x: radar_chart.config.width / 2, y: radar_chart.config.width / 2}; // p0
-  var segmentEnd = {x: radar_chart.xCoord(index, radar_chart.config.maxValue), y: radar_chart.yCoord(index, radar_chart.config.maxValue)} // p1
-
-  // Stolen from: http://bl.ocks.org/mbostock/4281513
-  var x10 = segmentEnd.x - segmentOrigin.x,
-      y10 = segmentEnd.y - segmentOrigin.y,
-      x20 = d3.event.x - segmentOrigin.x,
-      y20 = d3.event.y - segmentOrigin.y,
-      pointLineSegmentParam = (x20 * x10 + y20 * y10) / (x10 * x10 + y10 * y10)
-      newXValue = segmentOrigin.x + pointLineSegmentParam * x10,
-      newYValue = segmentOrigin.y + pointLineSegmentParam * y10;
-
-/*
-  if(newVal > radar_chart.config.maxValue)
-    newVal = radar_chart.config.maxValue;
-  if(newVal <= 0)
-    newVal =  0;
-
-  var newPoint = base_axis.points[newVal];
-  if(newPoint){
-    */
-    target.attr("cx", function(){ return newXValue; })
-          .attr("cy", function(){ return newYValue; });
-//  }
-
-  _.each(radar_chart.data.axes, function(a){
-    if(a.axis === axis.axis) {
-      var valBasedOnX = radar_chart.xCoordToValue(index, newXValue),
-          valBasedOnY = radar_chart.yCoordToValue(index, newYValue);
-      // Check for crazy values and axes that overlap with our coordinate system's before accepting values
-      if (!isNaN(valBasedOnX) && isFinite(valBasedOnX) && (newXValue > radar_chart.config.width / 2 + 1 && newXValue < radar_chart.config.width / 2 - 1)) {
-        a.value = valBasedOnX;
-      } else if (!isNaN(valBasedOnY) && isFinite(valBasedOnY)) {
-        a.value = valBasedOnY;
-      } else {
-        console.log(" NEW VAL explodes: " + valBasedOnX + " - " + valBasedOnY);
-      }
-      console.log({d3x: d3.event.x, d3y: d3.event.y, d3dx: d3.event.dx, d3dy: d3.event.dy, x: newXValue, y: newYValue, xValue: valBasedOnX, yValue: valBasedOnY})
-    }
-  });
-  radar_chart.update();
-
-
-  radar_chart.projection = d3.select('svg').append("path")
-      .attr("class", "line");
-  d3.select('.line').attr("d", "M" + [d3.event.x, d3.event.y] + "L" + [newXValue, newYValue]);
-  console.log("end x: " + d3.event.x)
 };
 
 RadarChart.prototype.update = function() {
@@ -353,7 +302,7 @@ RadarChart.prototype.update = function() {
   //get rid of any remaining svgs
   d3.select(radar_chart.id).select("polygon." + radar_chart.config.className).remove();
 
-  radar_chart.drawAxis();
+
   //generate data points
   var dataPoints = {
     className: radar_chart.className,
@@ -371,10 +320,6 @@ RadarChart.prototype.update = function() {
 //given a radar chart and it's options, create & render
 //a multi-draggable radar chart
 RadarChart.prototype.draw = function() {
-
-  //set global accessor (mainly used in move function)
-  setGlobalRadarObject(this);
-
   var radar_chart = this;
   radar_chart.updateScale();
   radar_chart.addAxisNames();
@@ -390,18 +335,8 @@ RadarChart.prototype.draw = function() {
                         .attr("width", radar_chart.config.width)
                         .attr("height", radar_chart.config.height)
 
-  //draw the frame and the axis
-  //radar_chart.drawFrame();
   radar_chart.drawAxis();
-
-  var dataPoints = {
-    className: radar_chart.className,
-    data : radar_chart.calculatePoints(radar_chart.data.axes)
-  };
-
-  //render polygon
-  var poly = radar_chart.generatePolygon(dataPoints);
-  radar_chart.renderPolygon(poly);
   radar_chart.renderNodes(radar_chart.data);
+  this.update();
 
 };
