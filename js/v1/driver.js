@@ -13,6 +13,7 @@ $(document).ready(function(){
     factorLegend: 1,
     radians: 2 * Math.PI,
     maxValue: 100, // TODO: Make this dynamic
+    normalizedMax: 10 // TODO: should this be here or set inside the application?
   });
 
   var minMetrics = [

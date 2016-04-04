@@ -130,6 +130,22 @@ function RadarChartSet(id, axis, options) {
   }
 
   function draw() {
+    _.each(radarCharts, function(chart){
+      _.each(chart.data, function(axis){
+
+        var key = _.find(self.axis.axes, function(key_val){
+          return key_val.metric === axis.metric;
+        });
+        //set 10 as the max value
+        axis.normalizedVal = self.axis.config.normalizedMax * (axis.value / key.max);
+        key.normalizedMax = self.axis.config.normalizedMax * (key.max / key.max);
+        key.normalizedMin = self.axis.config.normalizedMin * (key.min / key.max) || 0;
+        //console.log(axis);
+        console.log(key);
+
+      });
+    });
+
     _.each(radarCharts, function(chart) {
       chart.renderPolygon(self.axis, self.graph);
     })
@@ -154,7 +170,6 @@ function NewRadarChart(data, options) {
   this.draw = draw;
   this.renderNodes = renderNodes;
   this.renderPolygon = renderPolygon;
-  this.normalize = normalize;
   activate();
 
   function activate() {
@@ -179,10 +194,6 @@ function NewRadarChart(data, options) {
         this.config[i] = options[i];
       }
     };
-  }
-
-  function normalize(){
-    console.log(this);
   }
 
   function draw(axis, graph) {
