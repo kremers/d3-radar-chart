@@ -31,19 +31,19 @@ function RadarChartAxis(paramArray, config) {
 
   //for each xCord and yCoord, used normalized values instead of maxValue
   function xCoord(axisName, value) {
-    return this.config.width / 2.0 * (1 - (parseFloat(Math.max(value, 0)) / this.config.maxValue) * this.config.factor * Math.sin(nameToIndex(axisName) * this.config.radians / this.numberOfAxes));
+    return this.config.width / 2.0 * (1 - (parseFloat(Math.max(value, 0)) / this.config.normalizedMax) * this.config.factor * Math.sin(nameToIndex(axisName) * this.config.radians / this.numberOfAxes));
   }
 
   function yCoord(axisName, value) {
-    return this.config.height / 2 * (1 - (parseFloat(Math.max(value, 0)) / this.config.maxValue) * this.config.factor * Math.cos(nameToIndex(axisName) * this.config.radians / this.numberOfAxes));
+    return this.config.height / 2 * (1 - (parseFloat(Math.max(value, 0)) / this.config.normalizedMax) * this.config.factor * Math.cos(nameToIndex(axisName) * this.config.radians / this.numberOfAxes));
   }
 
   function xCoordToValue(axisName, xCoord) {
-    return this.config.maxValue * ( (1 - 2 * xCoord / this.config.width) / Math.sin(this.config.radians * nameToIndex(axisName) / this.numberOfAxes) / this.config.factor);
+    return this.config.normalizedMax * ( (1 - 2 * xCoord / this.config.width) / Math.sin(this.config.radians * nameToIndex(axisName) / this.numberOfAxes) / this.config.factor);
   }
 
   function yCoordToValue(axisName, yCoord) {
-    return this.config.maxValue * ( (1 - 2 * yCoord / this.config.height) / Math.cos(this.config.radians * nameToIndex(axisName) / this.numberOfAxes) / this.config.factor);
+    return this.config.normalizedMax * ( (1 - 2 * yCoord / this.config.height) / Math.cos(this.config.radians * nameToIndex(axisName) / this.numberOfAxes) / this.config.factor);
   }
 
   //normalization notes
@@ -51,8 +51,6 @@ function RadarChartAxis(paramArray, config) {
   //for each axis passed in, collect the max value
   //collect the value assigned to the axis as well
   //return the ratio
-
-
 
   /*
     Graph is a D3 SVG object
@@ -69,10 +67,10 @@ function RadarChartAxis(paramArray, config) {
         .attr("x1", self.config.width / 2.0)
         .attr("y1", self.config.height / 2.0)
         .attr("x2", function(axis, index){
-          return self.xCoord(axis, self.config.maxValue); // use normalized value
+          return self.xCoord(axis, self.config.normalizedMax); // use normalized value
         })
         .attr("y2", function(axis, index){
-          return self.yCoord(axis, self.config.maxValue); // use normalized value
+          return self.yCoord(axis, self.config.normalizedMax); // use normalized value
         })
         .attr("class", function(axis, index){
           return "line-"+index;
@@ -89,10 +87,10 @@ function RadarChartAxis(paramArray, config) {
         .style("font-size", "10px")
         .attr("transform", function(d, i) {return "translate(5, 5)";})
         .attr("x", function(axis, index){
-          return self.xCoord(axis, self.config.maxValue - 3); // used normalized value
+          return self.xCoord(axis, self.config.normalizedMax - 1); // used normalized value
         })
         .attr("y", function(axis, index){
-          return self.yCoord(axis, self.config.maxValue - 3); // used normalized value + what is this 3?
+          return self.yCoord(axis, self.config.normalizedMax - 1); // used normalized value + what is this 3?
         });
   }
 }
@@ -145,7 +143,7 @@ function RadarChartSet(id, axis, options) {
         key.normalizedMax = self.axis.config.normalizedMax * (key.max / key.max);
         key.normalizedMin = self.axis.config.normalizedMin * (key.min / key.max) || 0;
         //console.log(axis);
-        console.log(key);
+        //console.log(key);
       });
     });
 
@@ -213,7 +211,7 @@ function NewRadarChart(data, options) {
 
       var segmentOrigin = {x: axis.config.width / 2, y: axis.config.width / 2}; // p0
       //TODO: set this to used normalized values
-      var segmentEnd = {x: axis.xCoord(dataPoint.metric, axis.config.maxValue), y: axis.yCoord(dataPoint.metric, axis.config.maxValue)} // p1
+      var segmentEnd = {x: axis.xCoord(dataPoint.metric, axis.config.normalizedMax), y: axis.yCoord(dataPoint.metric, axis.config.normalizedMax)} // p1
 
       // Stolen from: http://bl.ocks.org/mbostock/4281513
       var x10 = segmentEnd.x - segmentOrigin.x,
@@ -242,7 +240,7 @@ function NewRadarChart(data, options) {
           //newValue = Math.max(newValue, 0);
           //newValue = Math.min(newValue, a.max);
           if (!(newValue < 0 || newValue > axis.metricDetails[dataPoint.metric].max)) {
-            a.value = newValue;
+            a.normalizedVal = newValue;
 
             target.attr("cx", function(){ return newXValue; })
                   .attr("cy", function(){ return newYValue; });
@@ -265,12 +263,12 @@ function NewRadarChart(data, options) {
          .enter()
          .append("svg:circle").attr("class", self.config.className)
          .attr("r", self.config.radius)
-         .attr("alt", function(dataPoint){ return Math.max(dataPoint.value, 0); }) //log this, see which val is used
+         .attr("alt", function(dataPoint){ return Math.max(dataPoint.normalizedVal, 0); }) //log this, see which val is used
          .attr("cx", function(dataPoint, index) {
-            return axis.xCoord(dataPoint.metric, dataPoint.value); // log this, see which val is used
+            return axis.xCoord(dataPoint.metric, dataPoint.normalizedVal); // log this, see which val is used
          })
          .attr("cy", function(dataPoint, index){
-            return axis.yCoord(dataPoint.metric, dataPoint.value)  // log see which val is used
+            return axis.yCoord(dataPoint.metric, dataPoint.normalizedVal)  // log see which val is used
          })
          .attr("data-id", function(dataPoint){ return dataPoint.metric; })
          .attr("circle-class", self.config.className)
@@ -280,7 +278,7 @@ function NewRadarChart(data, options) {
            d3.behavior.drag().on("drag", moveStep))
          .append("svg:title")
          .text(function (dataPoint) {
-           return Math.max(dataPoint.value, 0); //should return the actual value, non-normalized
+           return Math.max(dataPoint.normalizedVal, 0); //should return the actual value, non-normalized
          });
   }
 
@@ -290,15 +288,15 @@ function NewRadarChart(data, options) {
     graph.selectAll(".nodes")
       .data(self.data, function(dataPoint, index){
         dataValues[index] = [
-          axis.xCoord(dataPoint.metric, dataPoint.value), //update to normalized
-          axis.yCoord(dataPoint.metric, dataPoint.value)  //update to normalized
+          axis.xCoord(dataPoint.metric, dataPoint.normalizedVal), //update to normalized
+          axis.yCoord(dataPoint.metric, dataPoint.normalizedVal)  //update to normalized
         ];
       });
     var dataPoints = {
       className: self.config.className,
       data : dataValues //hmmmm
     };
-
+    console.log(dataValues);
     if (!self.polygon) {
       self.polygon = graph.selectAll("area")
                          .data([dataPoints.data]); //believe this is from the func above, so should be ok
