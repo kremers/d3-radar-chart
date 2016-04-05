@@ -1,8 +1,8 @@
 $(document).ready(function(){
 
   var axis = new RadarChartAxis([
-    { metric: "cpu", min: 0, max: 100, step: 1},
-    { metric: "ram", min: 0, max: 100, step: 1},
+    { metric: "cpu", min: 0, max: 10, step: 1},
+    { metric: "ram", min: 0, max: 4096, step: 1},
     { metric: "network_io", min: 0, max: 100, step: 1 },
     { metric: "disk_io", min: 0, max: 100, step: 1 },
     { metric: "blah1", min: 0, max: 100, step: 1 },
@@ -13,12 +13,11 @@ $(document).ready(function(){
     factorLegend: 1,
     radians: 2 * Math.PI,
     maxValue: 100, // TODO: Make this dynamic
-    normalizedMax: 10 // TODO: should this be here or set inside the application?
   });
 
   var minMetrics = [
-    { metric: "cpu", value: 10},
-    { metric: "ram", value: 10 },
+    { metric: "cpu", value: 3},
+    { metric: "ram", value: 1024 },
     { metric: "network_io", value: 10 },
     { metric: "disk_io", value: 10 },
     { metric: "blah1", value: 10 },
@@ -30,8 +29,8 @@ $(document).ready(function(){
 
   var maxOptions = { className: "max-radar", color: "#0097D6" };
   var maxMetrics = [
-    { metric: "cpu", value: 30 },
-    { metric: "ram", value: 20},
+    { metric: "cpu", value: 5 },
+    { metric: "ram", value: 2048},
     { metric: "network_io", value: 45 },
     { metric: "disk_io", value: 35 },
     { metric: "blah1", value: 47 },
