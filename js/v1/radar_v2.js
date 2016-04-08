@@ -1,5 +1,12 @@
 //Radar Chart v2
 
+var tip = d3.tip()
+            .attr('class', 'd3-tip')
+            .offset([-10, 0])
+            .html(function(d) {
+              return "<span style='color:white'>" + d.metric + ": " + d.value.toFixed(2) + " " + d.unit + "</span>";
+            });
+
 function RadarChartAxis(paramArray, config) {
   var self = this;
   this.metricDetails = {};
@@ -70,7 +77,7 @@ function RadarChartAxis(paramArray, config) {
           return "line-"+index;
         })
         .style("stroke", "#7f8c8d")
-        .style("stroke-width", "2px");
+        .style("stroke-width", "1.5px");
 
 
     //adds a label for each axis based on the axis title
@@ -78,13 +85,13 @@ function RadarChartAxis(paramArray, config) {
         .attr("class", "axis-label")
         .text(function(item){return item;})
         .style("font-family", "Helvetica")
-        .style("font-size", "10px")
-        .attr("transform", function(d, i) {return "translate(5, 5)";})
+        .style("font-size", "12px")
+        .attr("transform", function(d, i) {return "translate(5, 4)";})
         .attr("x", function(axis, index){
-          return self.xCoord(axis, self.config.normalizedMax - 1);
+          return self.xCoord(axis, self.config.normalizedMax - 400);
         })
         .attr("y", function(axis, index){
-          return self.yCoord(axis, self.config.normalizedMax - 1);
+          return self.yCoord(axis, self.config.normalizedMax - 400);
         });
   }
 }
@@ -117,7 +124,8 @@ function RadarChartSet(id, axis, options) {
     self.graph = d3.select(id)
                   .append("svg")
                   .attr("width", axis.config.width)
-                  .attr("height", axis.config.height);
+                  .attr("height", axis.config.height)
+                  .call(tip);
   }
 
   function addRadarChart(chart) {
@@ -134,6 +142,8 @@ function RadarChartSet(id, axis, options) {
         axis.normalizedVal = self.axis.config.normalizedMax * (axis.value / key.max);
         key.normalizedMax = self.axis.config.normalizedMax * (key.max / key.max);
         key.normalizedMin = self.axis.config.normalizedMin * (key.min / key.max) || 0;
+        axis.key_max = key.max;
+        axis.normalizedMax =  key.normalizedMax;
       });
     });
   }
@@ -209,7 +219,7 @@ function NewRadarChart(data, options) {
   }
 
   function renderNodes(axis, graph) {
-
+    var tooltip;
     // closure in renderNodes
     function moveStep(dataPoint, index) {
       var target = d3.select(this);
@@ -245,7 +255,7 @@ function NewRadarChart(data, options) {
           //newValue = Math.min(newValue, a.max);
           if (!(newValue < 0 || newValue > axis.metricDetails[dataPoint.metric].normalizedMax)) {
             a.normalizedVal = newValue;
-
+            a.value = a.key_max * (a.normalizedVal / a.normalizedMax); //denormalization auto computed here
             target.attr("cx", function(){ return newXValue; })
                   .attr("cy", function(){ return newYValue; });
           } else {
@@ -256,17 +266,17 @@ function NewRadarChart(data, options) {
 
       renderPolygon(axis, graph);
 
-      graph.projection = d3.select('svg').append("path")
-          .attr("class", "line");
-      d3.select('.line').attr("d", "M" + [d3.event.x, d3.event.y] + "L" + [newXValue, newYValue]);
+      //graph.projection = d3.select('svg').append("path").attr("class", "line");
+      //d3.select('.line').attr("d", "M" + [d3.event.x, d3.event.y] + "L" + [newXValue, newYValue]);
     }; // End moveStep
-
 
     graph.selectAll(".nodes")
          .data(self.data)
          .enter()
-         .append("svg:circle").attr("class", self.config.className)
-         .attr("r", self.config.radius)
+         .append("svg:circle").attr("class", function(d){
+           return self.config.className + "-" + d.metric;
+         })
+         .attr("r", self.config.radius * 1.5)
          .attr("alt", function(dataPoint){ return Math.max(dataPoint.normalizedVal, 0); })
          .attr("cx", function(dataPoint, index) {
             return axis.xCoord(dataPoint.metric, dataPoint.normalizedVal);
@@ -276,14 +286,12 @@ function NewRadarChart(data, options) {
          })
          .attr("data-id", function(dataPoint){ return dataPoint.metric; })
          .attr("circle-class", self.config.className)
+         .attr("title", function(d){return d.metric;})
          .style("fill", self.config.color)
          .style("fill-opacity", 0.9)
-         .call(
-           d3.behavior.drag().on("drag", moveStep))
-         .append("svg:title")
-         .text(function (dataPoint) {
-           return Math.max(dataPoint.normalizedVal, 0);
-         });
+         .call(d3.behavior.drag().on("drag", moveStep))
+         .on('mouseover', tip.show)
+         .on('mouseout', tip.hide);
   }
 
   function renderPolygon(axis, graph) {
@@ -306,16 +314,8 @@ function NewRadarChart(data, options) {
       self.polygon.enter()
                    .append("polygon")
                    .attr("class", self.config.className)
-                   .style("stroke-width", "2px")
-                   .style("stroke", self.config.color)
-                   .on("mouseover", function(object){
-                      element = "polygon." + self.config.className;
-                      //graph.selectAll("polygon").transition(200).style("fill-opacity", 0.1);
-                      //graph.selectAll(element).transition(200).style("fill-opacity", 0.7);
-                   })
-                   .on("mouseout", function(){
-                       //graph.selectAll("polygon").transition(200).style("fill-opacity", self.config.opacityArea);
-                   })
+                   .style("stroke-width", "1.5px")
+                   .style("stroke", self.config.stroke)
                    .style("fill", function(data, i){ return self.config.color; })
                    .style("fill-opacity", self.config.opacityArea);
       self.polygon.exit();
