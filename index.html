@@ -16,6 +16,8 @@
   <script src="js/libraries/bootstrap.min.js"></script>
   <script src="js/libraries/underscore.min.js"></script>
   <script src="js/libraries/d3.min.js"></script>
+  <script src="js/libraries/d3-tip.js"></script>
+  <script src="js/libraries/d3-bootstrap.js"></script>
   <script src="js/v1/radar_v2.js"></script>
   <script src="js/v1/driver.js"></script>
 
@@ -61,38 +63,49 @@
         <div id="chart"></div>
       </div>
       <div class="col-md-5">
-        <p><strong>Source:</strong> <a href='https://github.com/alangrafu/radar-chart-d3'>Alangrafu - Radar Chart D3</a></p>
-        <p><strong>Source:</strong> <a href='https://github.com/azole/d3-radar-chart-draggable'>Azole - D3 Radar Chart Draggable</a></p>
-        <blockquote>
-          <p><strong>Goal</strong> is to create a simple, reusable, json passable radar chart that takes in
-          the following values as an input, and have the ability to render multiple
-          radar charts, as well as have the ability to drag and see the data manipulation
-          in real time as the values are updated.</p>
-        </blockquote>
-
-        <strong>Code:</strong>
-        <pre>
-//Data Example
-var data = [{
-  "className": "Name of the Class",
-  "normalize": true,
-  "scale_max": 20,
-  "drag": true
-  "axes" : [
-    {
-      "axis" : "name of axis",
-      "value": 4,
-      "abs_min" : 0,
-      "min" : 0,
-      "abs_max" : 10,
-      "max" : 10,
-      "step": 1
-    },...
-  ]
-}]
-
-RadarChart.draw("#chart", data);
-       </pre>
+        <h3>Update Metrics</h3>
+        <div class="btn-group" role="group" aria-label="btn-toggle-group-thing">
+          <button type="button" class="btn btn-default active">Mininium Thresholds</button>
+          <button type="button" class="btn btn-default">Maximum Thresholds</button>
+        </div>
+        <hr>
+        <form class="form-horizontal">
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="email" class="form-control" id="inputEmail3" placeholder="CPU">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="password" class="form-control" id="inputPassword3" placeholder="Tasks">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="email" class="form-control" id="inputEmail3" placeholder="Memory">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="password" class="form-control" id="inputPassword3" placeholder="Bandwidth">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="email" class="form-control" id="inputEmail3" placeholder="Disk Read Speed">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <input type="password" class="form-control" id="inputPassword3" placeholder="Disk Write Speed">
+            </div>
+          </div>
+          <div class="form-group">
+            <div class="col-sm-12">
+              <button onclick="" class="btn btn-default">Update</button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
   </div>

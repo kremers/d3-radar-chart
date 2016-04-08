@@ -128,7 +128,7 @@ $(document).ready(function(){
           .text(function(d) {
             return d
           }).style("font-family", "sans-serif").style("font-size", "10px").attr("transform", function(d, i) {
-            return "translate(0, -10)";
+            return "translate(0, 10)";
           })
           .attr("x", function(d, i) {
             return config.w / 2 * (1 - config.factorLegend * Math.sin(i * config.radians / total)) - 20 * Math.sin(i * config.radians / total);
