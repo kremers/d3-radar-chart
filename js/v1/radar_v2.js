@@ -167,7 +167,8 @@ function RadarChartSet(id, axis, options) {
     })
     self.axis.draw(self.graph);
     _.each(radarCharts, function(chart) {
-      chart.renderNodes(self.axis, self.graph);
+      if(chart.config.draggable === true)
+        chart.renderNodes(self.axis, self.graph);
     })
   }
 
