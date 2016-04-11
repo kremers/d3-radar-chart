@@ -106,7 +106,6 @@ function RadarChartSet(id, axis, options) {
   var self = this;
   this.addRadarChart = addRadarChart;
   this.draw = draw;
-  this.getData = getData;
   this.normalize = normalize;
   this.denormalize = denormalize;
   var radarCharts = [];
@@ -171,15 +170,6 @@ function RadarChartSet(id, axis, options) {
         chart.renderNodes(self.axis, self.graph);
     })
   }
-
-  //should pass in the name of the chart instead
-  //TODO: getData should convert the normalized value back into it's original form
-  function getData(chartTitle){
-    var chart =  _.find(radarCharts, function(item){
-      return item.config.className.toLowerCase() === chartTitle.toLowerCase();
-    });
-    return chart.data || "no data found";
-  }
 }
 
 function NewRadarChart(data, options) {
@@ -188,6 +178,7 @@ function NewRadarChart(data, options) {
   this.draw = draw;
   this.renderNodes = renderNodes;
   this.renderPolygon = renderPolygon;
+  this.getData = getData;
   activate();
 
   function activate() {
@@ -219,8 +210,18 @@ function NewRadarChart(data, options) {
     renderNodes(axis, graph);
   }
 
+  function getData(metric){
+    return _.find(self.data, function(item){
+      return item.metric === metric;
+    });
+  }
+
   function renderNodes(axis, graph) {
     var tooltip;
+    //set min and max constraints for the function
+    var minConstraint = this.config.minBoundingFn;
+    var maxConstraint = this.config.maxBoundingFn;
+
     // closure in renderNodes
     function moveStep(dataPoint, index) {
       var target = d3.select(this);
@@ -254,7 +255,8 @@ function NewRadarChart(data, options) {
 
           //newValue = Math.max(newValue, 0);
           //newValue = Math.min(newValue, a.max);
-          if (!(newValue < 0 || newValue > axis.metricDetails[dataPoint.metric].normalizedMax)) {
+
+          if (!(newValue < minConstraint(dataPoint.metric) || newValue > maxConstraint(dataPoint.metric))) {
             a.normalizedVal = newValue;
             a.value = a.key_max * (a.normalizedVal / a.normalizedMax); //denormalization auto computed here
             target.attr("cx", function(){ return newXValue; })
