@@ -77,8 +77,8 @@ function RadarChartAxis(paramArray, config) {
           return "line-"+index;
         })
         .style("stroke", "#000")
+        .style("z-index", 0)
         .style("stroke-width", "1.5px");
-
 
     //adds a label for each axis based on the axis title
     axis.append("text")
@@ -291,7 +291,7 @@ function NewRadarChart(data, options) {
          .attr("circle-class", self.config.className)
          .attr("title", function(d){return d.metric;})
          .style("fill", self.config.color)
-         .style("fill-opacity", 1.0)
+         .style("fill-opacity", 0.9)
          .call(d3.behavior.drag().on("drag", moveStep))
          .on('mouseover', tip.show)
          .on('mouseout', tip.hide);
@@ -320,6 +320,7 @@ function NewRadarChart(data, options) {
                    .style("stroke-width", "1.5px")
                    .style("stroke", self.config.stroke)
                    .style("fill", function(data, i){ return self.config.color; })
+                   .style("z-index", 10)
                    .style("fill-opacity", self.config.opacityArea);
       self.polygon.exit();
     } else {

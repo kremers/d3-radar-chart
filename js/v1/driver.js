@@ -5,6 +5,11 @@ $(document).ready(function(){
   }
 
   //Main
+
+  var red = "#E7594B";
+  var green = "#2ecc71";
+  var blue = "#00976D";
+
   var axis = new RadarChartAxis([
     { metric: "CPU", min: 0.0, max: 100.0, step: 1}, //% Activity
     { metric: "Memory", min: 0, max: 100.0, step: 1}, //% Activity
@@ -13,7 +18,7 @@ $(document).ready(function(){
     { metric: "Disk_Write", min: 0, max: 100, step: 1}, //GB/s
     { metric: "Tasks", min: 0, max: 50, step: 1 } //#
   ], {
-    width: 400, height: 400, factorLegend: 1,
+    width: 300, height: 300, factorLegend: 1,
     radians: 2 * Math.PI, maxValue: 100, // TODO: Make this dynamic
   });
 
@@ -24,14 +29,14 @@ $(document).ready(function(){
     { metric: "Bandwidth", value: 25, unit: "GB/S"},
     { metric: "Disk_Read", value: 25, unit: "GB/S"},
     { metric: "Disk_Write", value: 25, unit: "GB/S"},
-    { metric: "Tasks", value: 15, unit: "tasks"}
+    { metric: "Tasks", value: 12.75, unit: "tasks"}
   ];
 
   var minOptions = {
     className: "min-radar",
-    color: "#3498db",
-    stroke: "#0097D6",
-    opacityArea: 1,
+    color: red,
+    stroke: red,
+    opacityArea: 1.0,
     draggable: true
   };
   var minRadarChart = new NewRadarChart(minMetrics, minOptions);
@@ -39,9 +44,10 @@ $(document).ready(function(){
   //Max Chart
   var maxOptions = {
     className: "max-radar",
-    color: "#c0392b",
-    stroke: "#c0392b",
+    color: green,
+    stroke: green,
     draggable: true,
+    opacityArea: 1.0,
     minBoundingFn: function(metric){
       //bounded to the the current normalized value of the min chart
       return minRadarChart.getData(metric).normalizedVal;
@@ -54,7 +60,7 @@ $(document).ready(function(){
     { metric: "Bandwidth", value: 75, unit: "GB/S"},
     { metric: "Disk_Read", value: 75, unit: "GB/S"},
     { metric: "Disk_Write", value: 75, unit: "GB/S"},
-    { metric: "Tasks", value: 40, unit: "tasks"}
+    { metric: "Tasks", value: 37.75, unit: "tasks"}
   ];
   var maxRadarChart = new NewRadarChart(maxMetrics, maxOptions);
 
@@ -83,28 +89,47 @@ $(document).ready(function(){
   //Live Chart
   var liveOptions = {
     className: "live-radar",
-    color: "rgba(236, 240, 241,0.0)",
-    stroke: "#ecf0f1",
+    color: "rgba(236, 240, 241, 0.0)",
+    stroke: "#000",
     draggable: false
   };
 
   var liveMetrics = [
-    { metric: "CPU", value: 55.0, unit: "%"},
-    { metric: "Memory", value: 55.0, unit: "%"},
+    { metric: "CPU", value: 50.0, unit: "%"},
+    { metric: "Memory", value: 50.0, unit: "%"},
     { metric: "Bandwidth", value: 50, unit: "GB/S"},
     { metric: "Disk_Read", value: 50, unit: "GB/S"},
     { metric: "Disk_Write", value: 50, unit: "GB/S"},
-    { metric: "Tasks", value: 25, unit: "tasks"}
+    { metric: "Tasks", value: 25.75, unit: "tasks"}
   ];
   var liveRadarChart = new NewRadarChart(liveMetrics, liveOptions);
 
+  //backChart
+  var backOptions = {
+    className: "back-radar",
+    color: "red",
+    opacityArea: 0.7,
+    draggable: false
+  };
+
+  var backMetrics = [
+    { metric: "CPU", value: 100.0, unit: "%"},
+    { metric: "Memory", value: 100.0, unit: "%"},
+    { metric: "Bandwidth", value: 100, unit: "GB/S"},
+    { metric: "Disk_Read", value: 100, unit: "GB/S"},
+    { metric: "Disk_Write", value: 100, unit: "GB/S"},
+    { metric: "Tasks", value: 50, unit: "tasks"}
+  ];
+  var backChart = new NewRadarChart(backMetrics, backOptions);
+
 
   var chartSet = new RadarChartSet("#chart", axis, {
-    width: 400,
-    height: 400,
+    width: 300,
+    height: 300,
     radius: 3
   });
 
+  chartSet.addRadarChart(backChart);
   chartSet.addRadarChart(maxRadarChart);
   chartSet.addRadarChart(liveRadarChart);
   chartSet.addRadarChart(minRadarChart);
