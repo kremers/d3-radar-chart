@@ -76,7 +76,7 @@ function RadarChartAxis(paramArray, config) {
         .attr("class", function(axis, index){
           return "line-"+index;
         })
-        .style("stroke", "#7f8c8d")
+        .style("stroke", "#000")
         .style("stroke-width", "1.5px");
 
 
@@ -291,7 +291,7 @@ function NewRadarChart(data, options) {
          .attr("circle-class", self.config.className)
          .attr("title", function(d){return d.metric;})
          .style("fill", self.config.color)
-         .style("fill-opacity", 0.9)
+         .style("fill-opacity", 1.0)
          .call(d3.behavior.drag().on("drag", moveStep))
          .on('mouseover', tip.show)
          .on('mouseout', tip.hide);

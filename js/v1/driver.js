@@ -19,17 +19,17 @@ $(document).ready(function(){
 
   //Min Chart
   var minMetrics = [
-    { metric: "CPU", value: 20.0, unit: "%"},
-    { metric: "Memory", value: 20.0, unit: "%"},
-    { metric: "Bandwidth", value: 10, unit: "GB/S"},
-    { metric: "Disk_Read", value: 10, unit: "GB/S"},
-    { metric: "Disk_Write", value: 12, unit: "GB/S"},
-    { metric: "Tasks", value: 5, unit: "tasks"}
+    { metric: "CPU", value: 25.0, unit: "%"},
+    { metric: "Memory", value: 25.0, unit: "%"},
+    { metric: "Bandwidth", value: 25, unit: "GB/S"},
+    { metric: "Disk_Read", value: 25, unit: "GB/S"},
+    { metric: "Disk_Write", value: 25, unit: "GB/S"},
+    { metric: "Tasks", value: 15, unit: "tasks"}
   ];
 
   var minOptions = {
     className: "min-radar",
-    color: "#FFF",
+    color: "#3498db",
     stroke: "#0097D6",
     opacityArea: 1,
     draggable: true
@@ -39,8 +39,8 @@ $(document).ready(function(){
   //Max Chart
   var maxOptions = {
     className: "max-radar",
-    color: "#0097D6",
-    stroke: "#0097D6",
+    color: "#c0392b",
+    stroke: "#c0392b",
     draggable: true,
     minBoundingFn: function(metric){
       //bounded to the the current normalized value of the min chart
@@ -51,10 +51,10 @@ $(document).ready(function(){
   var maxMetrics = [
     { metric: "CPU", value: 75.0, unit: "%"},
     { metric: "Memory", value: 75.0, unit: "%"},
-    { metric: "Bandwidth", value: 85, unit: "GB/S"},
+    { metric: "Bandwidth", value: 75, unit: "GB/S"},
     { metric: "Disk_Read", value: 75, unit: "GB/S"},
-    { metric: "Disk_Write", value: 89, unit: "GB/S"},
-    { metric: "Tasks", value: 45, unit: "tasks"}
+    { metric: "Disk_Write", value: 75, unit: "GB/S"},
+    { metric: "Tasks", value: 40, unit: "tasks"}
   ];
   var maxRadarChart = new NewRadarChart(maxMetrics, maxOptions);
 
@@ -83,18 +83,18 @@ $(document).ready(function(){
   //Live Chart
   var liveOptions = {
     className: "live-radar",
-    color: "#40d47e",
-    stroke: "#27ae60",
+    color: "rgba(236, 240, 241,0.0)",
+    stroke: "#ecf0f1",
     draggable: false
   };
 
   var liveMetrics = [
-    { metric: "CPU", value: 45.0, unit: "%"},
-    { metric: "Memory", value: 45.0, unit: "%"},
+    { metric: "CPU", value: 55.0, unit: "%"},
+    { metric: "Memory", value: 55.0, unit: "%"},
     { metric: "Bandwidth", value: 50, unit: "GB/S"},
     { metric: "Disk_Read", value: 50, unit: "GB/S"},
     { metric: "Disk_Write", value: 50, unit: "GB/S"},
-    { metric: "Tasks", value: 18, unit: "tasks"}
+    { metric: "Tasks", value: 25, unit: "tasks"}
   ];
   var liveRadarChart = new NewRadarChart(liveMetrics, liveOptions);
 
