@@ -5,20 +5,15 @@ $(document).ready(function(){
   }
 
   //Main
-
-  var red = "#E7594B";
-  var green = "#2ecc71";
-  var blue = "#00976D";
-
   var axis = new RadarChartAxis([
-    { metric: "CPU", min: 0.0, max: 100.0, step: 1}, //% Activity
+    { metric: "CPU", min: 0.0, max: 100.0, step: 10}, //% Activity
     { metric: "Memory", min: 0, max: 100.0, step: 1}, //% Activity
     { metric: "Bandwidth", min: 0, max: 100, step: 1 }, //GB/s
     { metric: "Disk_Read", min: 0, max: 100, step: 1}, //GB/s
     { metric: "Disk_Write", min: 0, max: 100, step: 1}, //GB/s
     { metric: "Tasks", min: 0, max: 50, step: 1 } //#
   ], {
-    width: 300, height: 300, factorLegend: 1,
+    width: 400, height: 400, factorLegend: 1,
     radians: 2 * Math.PI, maxValue: 100, // TODO: Make this dynamic
   });
 
@@ -34,8 +29,8 @@ $(document).ready(function(){
 
   var minOptions = {
     className: "min-radar",
-    color: red,
-    stroke: red,
+    color: "#FFDDDD",
+    stroke: "#2ecc71",
     opacityArea: 1.0,
     draggable: true
   };
@@ -44,10 +39,9 @@ $(document).ready(function(){
   //Max Chart
   var maxOptions = {
     className: "max-radar",
-    color: green,
-    stroke: green,
+    color: "#2ecc71",
+    stroke: "#2ecc71",
     draggable: true,
-    opacityArea: 1.0,
     minBoundingFn: function(metric){
       //bounded to the the current normalized value of the min chart
       return minRadarChart.getData(metric).normalizedVal;
@@ -90,7 +84,7 @@ $(document).ready(function(){
   var liveOptions = {
     className: "live-radar",
     color: "rgba(236, 240, 241, 0.0)",
-    stroke: "#000",
+    stroke: "rgb(253, 255, 91)",
     draggable: false
   };
 
@@ -107,8 +101,8 @@ $(document).ready(function(){
   //backChart
   var backOptions = {
     className: "back-radar",
-    color: "red",
-    opacityArea: 0.7,
+    color: "#FFDDDD",
+    opacityArea: 1.0,
     draggable: false
   };
 
@@ -124,14 +118,16 @@ $(document).ready(function(){
 
 
   var chartSet = new RadarChartSet("#chart", axis, {
-    width: 300,
-    height: 300,
+    width: 400,
+    height: 400,
     radius: 3
   });
 
   chartSet.addRadarChart(backChart);
   chartSet.addRadarChart(maxRadarChart);
-  chartSet.addRadarChart(liveRadarChart);
   chartSet.addRadarChart(minRadarChart);
+  chartSet.addRadarChart(liveRadarChart);
   chartSet.draw();
+
+
 });
