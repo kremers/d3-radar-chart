@@ -49,7 +49,7 @@ blockquote p {
 #chartalt {
   z-index: 1;
 }
-.d3-tip {
+.d3-tooltip {
   line-height: 1;
   font-weight: bold;
   padding: 12px;
@@ -59,7 +59,7 @@ blockquote p {
 }
 
 /* Creates a small triangle extender for the tooltip */
-.d3-tip:after {
+.d3-tooltip:after {
   box-sizing: border-box;
   display: inline;
   font-size: 10px;
@@ -72,7 +72,7 @@ blockquote p {
 }
 
 /* Style northward tooltips differently */
-.d3-tip.n:after {
+.d3-tooltip.n:after {
   margin: -1px 0 0 0;
   top: 100%;
   left: 0;

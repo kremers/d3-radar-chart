@@ -1,7 +1,7 @@
 //Radar Chart v2
 
 var tip = d3.tip()
-            .attr('class', 'd3-tip')
+            .attr('class', 'd3-tooltip')
             .offset([-10, 0])
             .html(function(d) {
               return "<span style='color:white'>" + d.metric + ": " + d.value.toFixed(2) + " " + d.unit + "</span>";
@@ -76,7 +76,7 @@ function RadarChartAxis(paramArray, config) {
         .attr("class", function(axis, index){
           return "line-"+index;
         })
-        .style("stroke", "#000")
+        .style("stroke", "rgb(138, 138, 138)")
         .style("z-index", 0)
         .style("stroke-width", "1.5px");
 
@@ -108,6 +108,7 @@ function RadarChartSet(id, axis, options) {
   this.draw = draw;
   this.normalize = normalize;
   this.denormalize = denormalize;
+  this.getChart = getChart
   var radarCharts = [];
   activate();
 
@@ -132,6 +133,12 @@ function RadarChartSet(id, axis, options) {
     radarCharts.push(chart);
   }
 
+  function getChart(className){
+    return _.find(radarCharts, function(chart){
+      return chart.config.className === className;
+    });
+  }
+
   function normalize(){
     _.each(radarCharts, function(chart){
       _.each(chart.data, function(axis){
@@ -142,10 +149,16 @@ function RadarChartSet(id, axis, options) {
         axis.normalizedVal = self.axis.config.normalizedMax * (axis.value / key.max);
         key.normalizedMax = self.axis.config.normalizedMax * (key.max / key.max);
         key.normalizedMin = self.axis.config.normalizedMin * (key.min / key.max) || 0;
+        axis.normalizedStep = self.axis.config.normalizedMax * (key.step / key.max);
+        axis.step = key.step;
         axis.key_max = key.max;
         axis.normalizedMax =  key.normalizedMax;
       });
     });
+  }
+
+  function getChartData(){
+    return radarCharts;
   }
 
   function denormalize(){ //maybe have it accept a param
@@ -176,9 +189,9 @@ function NewRadarChart(data, options) {
   var self = this;
   this.setOptions = setOptions;
   this.draw = draw;
+  this.getData = getData;
   this.renderNodes = renderNodes;
   this.renderPolygon = renderPolygon;
-  this.getData = getData;
   activate();
 
   function activate() {
@@ -257,8 +270,19 @@ function NewRadarChart(data, options) {
           //newValue = Math.min(newValue, a.max);
 
           if (!(newValue < minConstraint(dataPoint.metric) || newValue > maxConstraint(dataPoint.metric))) {
-            a.normalizedVal = newValue;
+            //console.log(newValue - a.normalizedVal);
+            //a.normalizedVal = newValue;
+            if(newValue - a.normalizedVal > 0 && Math.abs(newValue - a.normalizedVal) > a.normalizedStep){
+              a.normalizedVal = a.normalizedVal + a.normalizedStep;
+            }else if(newValue -  a.normalizedVal < 0 && Math.abs(newValue - a.normalizedVal) > a.normalizedStep ){
+              a.normalizedVal = a.normalizedVal - a.normalizedStep;
+            }else{
+              a.normalizedVal = a.normalizedVal;
+            }
+
+
             a.value = a.key_max * (a.normalizedVal / a.normalizedMax); //denormalization auto computed here
+            console.log(a.value);
             target.attr("cx", function(){ return newXValue; })
                   .attr("cy", function(){ return newYValue; });
           } else {
@@ -290,7 +314,7 @@ function NewRadarChart(data, options) {
          .attr("data-id", function(dataPoint){ return dataPoint.metric; })
          .attr("circle-class", self.config.className)
          .attr("title", function(d){return d.metric;})
-         .style("fill", self.config.color)
+         .style("fill", self.config.stroke)
          .style("fill-opacity", 0.9)
          .call(d3.behavior.drag().on("drag", moveStep))
          .on('mouseover', tip.show)
