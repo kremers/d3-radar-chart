@@ -272,6 +272,9 @@ function NewRadarChart(data, options) {
           if (!(newValue < minConstraint(dataPoint.metric) || newValue > maxConstraint(dataPoint.metric))) {
             //console.log(newValue - a.normalizedVal);
             //a.normalizedVal = newValue;
+            var multiple = Math.abs(newValue - a.normalizedVal) / a.normalizedStep;
+            var res = roundToNearest(newValue, multiple);
+            console.log(res);
             if(newValue - a.normalizedVal > 0 && Math.abs(newValue - a.normalizedVal) > a.normalizedStep){
               a.normalizedVal = a.normalizedVal + a.normalizedStep;
             }else if(newValue -  a.normalizedVal < 0 && Math.abs(newValue - a.normalizedVal) > a.normalizedStep ){
@@ -282,7 +285,7 @@ function NewRadarChart(data, options) {
 
 
             a.value = a.key_max * (a.normalizedVal / a.normalizedMax); //denormalization auto computed here
-            console.log(a.value);
+
             target.attr("cx", function(){ return newXValue; })
                   .attr("cy", function(){ return newYValue; });
           } else {
@@ -319,6 +322,11 @@ function NewRadarChart(data, options) {
          .call(d3.behavior.drag().on("drag", moveStep))
          .on('mouseover', tip.show)
          .on('mouseout', tip.hide);
+  }
+
+  function roundToNearest(number, multiple){
+   var half = multiple / 2.0;
+   return number + half - (number + half) % multiple;
   }
 
   function renderPolygon(axis, graph) {
