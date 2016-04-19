@@ -16,7 +16,7 @@ a:active {
   text-decoration: none;
 }
 .main {
-  padding: 40px;
+  padding: 60px 40px;
 }
 .center {
   text-align: center;
@@ -61,7 +61,7 @@ blockquote p {
 /* Creates a small triangle extender for the tooltip */
 .d3-tooltip:after {
   box-sizing: border-box;
-  display: inline;
+  display: block;
   font-size: 10px;
   width: 100%;
   line-height: 1;
@@ -69,6 +69,8 @@ blockquote p {
   content: "\25BC";
   position: absolute;
   text-align: center;
+  margin-top: 10px;
+  margin-right: 10px
 }
 
 /* Style northward tooltips differently */

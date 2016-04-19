@@ -86,6 +86,7 @@ function RadarChartAxis(paramArray, config) {
         .text(function(item){return item;})
         .style("font-family", "Helvetica")
         .style("font-size", "12px")
+        .style("font-weight", "bold")
         .attr("transform", function(d, i) {return "translate(5, 4)";})
         .attr("x", function(axis, index){
           return self.xCoord(axis, self.config.normalizedMax - 400);
@@ -124,9 +125,10 @@ function RadarChartSet(id, axis, options) {
     //create the graph
     self.graph = d3.select(id)
                   .append("svg")
-                  .attr("width", axis.config.width)
-                  .attr("height", axis.config.height)
+                  .attr("width", axis.config.width + 50)
+                  .attr("height", axis.config.height + 10)
                   .call(tip);
+
   }
 
   function addRadarChart(chart) {
@@ -139,17 +141,23 @@ function RadarChartSet(id, axis, options) {
     });
   }
 
+  function normalizeVal(axis, value) {
+      var key = _.find(self.axis.axes, function(key_val){ // this seems dumb
+        return key_val.metric === axis.metric;
+      });
+      return self.axis.config.normalizedMax * value / key.max
+  }
+
   function normalize(){
     _.each(radarCharts, function(chart){
       _.each(chart.data, function(axis){
-
-        var key = _.find(self.axis.axes, function(key_val){
+        var key = _.find(self.axis.axes, function(key_val){ // this seems dumb
           return key_val.metric === axis.metric;
         });
-        axis.normalizedVal = self.axis.config.normalizedMax * (axis.value / key.max);
-        key.normalizedMax = self.axis.config.normalizedMax * (key.max / key.max);
-        key.normalizedMin = self.axis.config.normalizedMin * (key.min / key.max) || 0;
-        axis.normalizedStep = self.axis.config.normalizedMax * (key.step / key.max);
+        axis.normalizedVal = normalizeVal(axis, axis.value);
+        key.normalizedMax = self.axis.config.normalizedMax;
+        key.normalizedMin = normalizeVal(axis, key.min / key.max) || 0;
+        axis.normalizedStep = normalizeVal(axis, key.step);
         axis.step = key.step;
         axis.key_max = key.max;
         axis.normalizedMax =  key.normalizedMax;
@@ -237,7 +245,9 @@ function NewRadarChart(data, options) {
 
     // closure in renderNodes
     function moveStep(dataPoint, index) {
+
       var target = d3.select(this);
+      var mousePoints = d3.mouse(this);
 
       var segmentOrigin = {x: axis.config.width / 2, y: axis.config.width / 2}; // p0
       var segmentEnd = {x: axis.xCoord(dataPoint.metric, axis.config.normalizedMax), y: axis.yCoord(dataPoint.metric, axis.config.normalizedMax)} // p1
@@ -264,41 +274,43 @@ function NewRadarChart(data, options) {
           } else {
             console.log(" NEW VAL explodes: " + valBasedOnX + " - " + valBasedOnY);
           }
-          //console.log({d3x: d3.event.x, d3y: d3.event.y, d3dx: d3.event.dx, d3dy: d3.event.dy, x: newXValue, y: newYValue, xValue: valBasedOnX, yValue: valBasedOnY})
 
-          //newValue = Math.max(newValue, 0);
-          //newValue = Math.min(newValue, a.max);
+          newValue = roundToNearest(newValue, a.normalizedStep)
 
           if (!(newValue < minConstraint(dataPoint.metric) || newValue > maxConstraint(dataPoint.metric))) {
-            //console.log(newValue - a.normalizedVal);
-            //a.normalizedVal = newValue;
-            var multiple = Math.abs(newValue - a.normalizedVal) / a.normalizedStep;
-            var res = roundToNearest(newValue, multiple);
-            console.log(res);
-            if(newValue - a.normalizedVal > 0 && Math.abs(newValue - a.normalizedVal) > a.normalizedStep){
-              a.normalizedVal = a.normalizedVal + a.normalizedStep;
-            }else if(newValue -  a.normalizedVal < 0 && Math.abs(newValue - a.normalizedVal) > a.normalizedStep ){
-              a.normalizedVal = a.normalizedVal - a.normalizedStep;
-            }else{
-              a.normalizedVal = a.normalizedVal;
-            }
+            a.normalizedVal = newValue;
 
 
             a.value = a.key_max * (a.normalizedVal / a.normalizedMax); //denormalization auto computed here
 
             target.attr("cx", function(){ return newXValue; })
                   .attr("cy", function(){ return newYValue; });
+
           } else {
             console.log("Won't extend axis beyond max value: " + axis.metricDetails[dataPoint.metric].max + ", have: " + newValue);
           }
         }
       });
 
+
+      //retrieve current vals
+      var tool_top = testStr(d3.select(".d3-tooltip").style('top')) + d3.event.dx;
+      var tool_left = testStr(d3.select(".d3-tooltip").style('left')) + d3.event.dy;
+
+      var coords = getCoords(this, graph, d3.select(".d3-tooltip").node());
+
+      //update
+      d3.select(".d3-tooltip")
+        .style("top", coords.top + 'px')
+        .style("left", coords.left + 'px')
+        .html("<span style='color:white'>" + dataPoint.metric + ": " + dataPoint.value.toFixed(2) + " " + dataPoint.unit + "</span>");
+
       renderPolygon(axis, graph);
 
       //graph.projection = d3.select('svg').append("path").attr("class", "line");
       //d3.select('.line').attr("d", "M" + [d3.event.x, d3.event.y] + "L" + [newXValue, newYValue]);
     }; // End moveStep
+
 
     graph.selectAll(".nodes")
          .data(self.data)
@@ -319,14 +331,44 @@ function NewRadarChart(data, options) {
          .attr("title", function(d){return d.metric;})
          .style("fill", self.config.stroke)
          .style("fill-opacity", 0.9)
-         .call(d3.behavior.drag().on("drag", moveStep))
-         .on('mouseover', tip.show)
-         .on('mouseout', tip.hide);
+         .call(d3.behavior.drag().on("drag", moveStep).on('dragstart', tip.show).on('dragend', tip.hide)
+         );
   }
 
   function roundToNearest(number, multiple){
    var half = multiple / 2.0;
    return number + half - (number + half) % multiple;
+  }
+
+  //returns coordinates for the node in question
+  function getCoords(target, graph, node){
+    var bbox = {};
+    var svg = getSVGNode(graph);
+    var matrix = target.getScreenCTM();
+    var tbbox = target.getBBox();
+    var point = svg.createSVGPoint();
+
+    point.x = tbbox.x;
+    point.y = tbbox.y;
+    bbox.n = point.matrixTransform(matrix);
+    var res = {
+      top: bbox.n.y - node.offsetHeight - 10,
+      left: bbox.n.x - node.offsetWidth / 2
+    };
+    return res;
+  }
+
+  //helper method to extract svg
+  function getSVGNode(el) {
+    el = el.node()
+    if(el.tagName.toLowerCase() === 'svg')
+      return el
+
+    return el.ownerSVGElement
+  }
+
+  function testStr(str){
+    return parseFloat(str.substr(0,str.length - 2));
   }
 
   function renderPolygon(axis, graph) {

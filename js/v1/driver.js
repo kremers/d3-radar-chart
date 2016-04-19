@@ -44,8 +44,8 @@ $(document).ready(function(){
   };
 
   var axis = new RadarChartAxis(_.values(axisValues), {
-    width: 400,
-    height: 400,
+    width: 360,
+    height: 360,
     factorLegend: 1,
     radians: 2 * Math.PI,
     maxValue: 100, // TODO: Make this dynamic
@@ -220,8 +220,8 @@ $(document).ready(function(){
 
 
   var chartSet = new RadarChartSet("#chart", axis, {
-    width: 400,
-    height: 400,
+    width: 360,
+    height: 360,
     radius: 3
   });
 
