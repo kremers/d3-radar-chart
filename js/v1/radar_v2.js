@@ -331,8 +331,9 @@ function NewRadarChart(data, options) {
          .attr("title", function(d){return d.metric;})
          .style("fill", self.config.stroke)
          .style("fill-opacity", 0.9)
-         .call(d3.behavior.drag().on("drag", moveStep).on('dragstart', tip.show).on('dragend', tip.hide)
-         );
+         .on('mouseover', tip.show)
+         .call(d3.behavior.drag().on("drag", moveStep).on('dragstart', tip.show).on('dragend', tip.hide))
+        .on('mouseout', tip.hide);
   }
 
   function roundToNearest(number, multiple){

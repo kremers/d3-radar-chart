@@ -58,14 +58,14 @@
 
       while(i--) nodel.classed(directions[i], false)
       coords = direction_callbacks.get(dir).apply(this)
+      console.log(dir);
       nodel.classed(dir, true).style({
         top: (coords.top +  poffset[0]) + scrollTop + 'px',
         left: (coords.left + poffset[1]) + scrollLeft + 'px'
-      })
-
-      return tip
+      });
+      console.log(coords);
+      return tip;;
     }
-
     // Public - hide the tooltip
     //
     // Returns a tip
@@ -282,7 +282,7 @@
     //
     // Returns an Object {n, s, e, w, nw, sw, ne, se}
     function getScreenBBox() {
-      var targetel   = target || d3.event.target;
+      var targetel = target || d3.event.target;
 
       while ('undefined' === typeof targetel.getScreenCTM && 'undefined' === targetel.parentNode) {
           targetel = targetel.parentNode;
